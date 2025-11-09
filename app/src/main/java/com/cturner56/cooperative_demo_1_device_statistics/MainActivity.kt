@@ -22,6 +22,7 @@ import com.cturner56.cooperative_demo_1_device_statistics.screens.AboutScreen
 import com.cturner56.cooperative_demo_1_device_statistics.screens.BatteryScreen
 import com.cturner56.cooperative_demo_1_device_statistics.screens.BuildScreen
 import com.cturner56.cooperative_demo_1_device_statistics.screens.DropdownMenu
+import com.cturner56.cooperative_demo_1_device_statistics.screens.FeedbackScreen
 import com.cturner56.cooperative_demo_1_device_statistics.screens.MemoryScreen
 
 
@@ -64,6 +65,9 @@ class MainActivity : ComponentActivity() {
                        }
                        composable(Destination.About.route) {
                            AboutScreen()
+                       }
+                       composable(Destination.Feedback.route) {
+                           FeedbackScreen()
                        }
                    }
                }

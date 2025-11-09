@@ -44,7 +44,9 @@ fun DropdownMenu(navController: NavController) {
             DropdownMenuItem(
                 text = { Text("Send Feedback") },
                 trailingIcon = { Icon(painter = ic_send, contentDescription = null) },
-                onClick = { /* Do something... */ }
+                onClick = {
+                    navController.navigate(Destination.Feedback.route)
+                }
             )
 
             HorizontalDivider()
