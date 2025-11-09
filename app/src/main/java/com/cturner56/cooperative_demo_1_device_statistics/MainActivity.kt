@@ -18,6 +18,7 @@ import androidx.navigation.compose.rememberNavController
 import com.cturner56.cooperative_demo_1_device_statistics.navigation.BottomNav
 import com.cturner56.cooperative_demo_1_device_statistics.ui.theme.CooperativeDemo1DeviceStatisticsTheme
 import com.cturner56.cooperative_demo_1_device_statistics.destinations.Destination
+import com.cturner56.cooperative_demo_1_device_statistics.screens.AboutScreen
 import com.cturner56.cooperative_demo_1_device_statistics.screens.BatteryScreen
 import com.cturner56.cooperative_demo_1_device_statistics.screens.BuildScreen
 import com.cturner56.cooperative_demo_1_device_statistics.screens.DropdownMenu
@@ -35,9 +36,9 @@ class MainActivity : ComponentActivity() {
                Scaffold(
                    topBar = {
                        TopAppBar(
-                           title = { Text("Co-op Learning Demo #1")},
+                           title = { Text("Co-op Learning Demo #2")},
                            actions = {
-                               DropdownMenu()
+                               DropdownMenu(navController)
                            }
                        )
                    },
@@ -60,6 +61,9 @@ class MainActivity : ComponentActivity() {
                        }
                        composable(Destination.Memory.route) {
                            MemoryScreen()
+                       }
+                       composable(Destination.About.route) {
+                           AboutScreen()
                        }
                    }
                }
