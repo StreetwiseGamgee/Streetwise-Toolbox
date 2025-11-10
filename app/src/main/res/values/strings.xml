@@ -1,3 +1,19 @@
 <resources>
-    <string name="app_name">Cooperative - Demo  - #1 - Device - Statistics</string>
+    <string name="app_name">Cooperative Demo 2</string>
+    <string name="about_application_description">
+        The main purpose of this application is to fetch device statistics, and overall health of the device.\n\n
+        In the future I would like to implement...\n\n
+        1. Temperature readings for the CPU and Battery to monitor, and warn users when their device is overheating.\n
+        2. A community forum where users can discuss their findings.\n
+        3. Provide a repository of links I find useful for tinkering with Android.\n
+    </string>
+    <string name="about_developer_description">
+        Hi There my name is Craig!\n\n
+        I\'m a fifth term BIT Student at RRC Polytech, and I have a passion for Android\'s Open-Source Project!\n\n
+        I began my journey in early 2013 with the introduction of my first smartphone the Samsung Galaxy Ace II X.
+    </string>
+    <string name="feedback_welcome_description">
+        Hi again!\n\nI\'m glad you\'ve taken the time to checkout my application, feel free to send feedback or suggestions!
+        I appreciate your time and considerations :)
+    </string>
 </resources>
