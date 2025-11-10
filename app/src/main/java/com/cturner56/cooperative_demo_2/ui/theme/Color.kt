@@ -1,4 +1,4 @@
-package com.cturner56.cooperative_demo_1_device_statistics.ui.theme
+package com.cturner56.cooperative_demo_2.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

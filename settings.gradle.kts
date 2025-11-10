@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Cooperative - Demo  - #1 - Device - Statistics"
+rootProject.name = "Cooperative Demo #2"
 include(":app")
  

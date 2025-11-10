@@ -1,11 +1,11 @@
-package com.cturner56.cooperative_demo_1_device_statistics.screens
+package com.cturner56.cooperative_demo_2.screens
 
 import androidx.compose.foundation.layout.Box
-import com.cturner56.cooperative_demo_1_device_statistics.R
+import com.cturner56.cooperative_demo_2.R
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
-import com.cturner56.cooperative_demo_1_device_statistics.destinations.Destination
+import com.cturner56.cooperative_demo_2.destinations.Destination
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text

@@ -1,4 +1,4 @@
-package com.cturner56.cooperative_demo_1_device_statistics.screens
+package com.cturner56.cooperative_demo_2.screens
 
 import android.content.Intent
 import android.content.IntentFilter
@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.cturner56.cooperative_demo_1_device_statistics.ui.theme.CooperativeDemo1DeviceStatisticsTheme
+import com.cturner56.cooperative_demo_2.ui.theme.CooperativeDemo1DeviceStatisticsTheme
 
 @Composable
 fun BatteryScreen(){

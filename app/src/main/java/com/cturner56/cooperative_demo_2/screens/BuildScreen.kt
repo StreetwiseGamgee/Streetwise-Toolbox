@@ -1,4 +1,4 @@
-package com.cturner56.cooperative_demo_1_device_statistics.screens
+package com.cturner56.cooperative_demo_2.screens
 
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
@@ -12,7 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.cturner56.cooperative_demo_1_device_statistics.ui.theme.CooperativeDemo1DeviceStatisticsTheme
+import com.cturner56.cooperative_demo_2.ui.theme.CooperativeDemo1DeviceStatisticsTheme
 import androidx.compose.ui.unit.dp
 
 fun getBuildProps(): Map<String, String> {
