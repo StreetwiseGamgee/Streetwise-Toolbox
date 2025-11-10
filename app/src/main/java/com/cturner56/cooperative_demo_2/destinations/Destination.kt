@@ -1,4 +1,4 @@
-package com.cturner56.cooperative_demo_1_device_statistics.destinations
+package com.cturner56.cooperative_demo_2.destinations
 
 open class Destination(val route:String) {
     object Battery: Destination("Battery")

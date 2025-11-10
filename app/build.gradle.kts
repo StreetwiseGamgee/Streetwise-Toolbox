@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cturner56.cooperative_demo_1_device_statistics"
+    namespace = "com.cturner56.cooperative_demo_2"
     compileSdk = 36
 
     defaultConfig {

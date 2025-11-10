@@ -1,4 +1,4 @@
-package com.cturner56.cooperative_demo_1_device_statistics.navigation
+package com.cturner56.cooperative_demo_2.navigation
 
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -6,8 +6,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.cturner56.cooperative_demo_1_device_statistics.R
-import com.cturner56.cooperative_demo_1_device_statistics.destinations.Destination
+import com.cturner56.cooperative_demo_2.R
+import com.cturner56.cooperative_demo_2.destinations.Destination
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 

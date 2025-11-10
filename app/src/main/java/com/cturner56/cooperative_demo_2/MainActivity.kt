@@ -1,4 +1,4 @@
-package com.cturner56.cooperative_demo_1_device_statistics
+package com.cturner56.cooperative_demo_2
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,15 +15,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.cturner56.cooperative_demo_1_device_statistics.navigation.BottomNav
-import com.cturner56.cooperative_demo_1_device_statistics.ui.theme.CooperativeDemo1DeviceStatisticsTheme
-import com.cturner56.cooperative_demo_1_device_statistics.destinations.Destination
-import com.cturner56.cooperative_demo_1_device_statistics.screens.AboutScreen
-import com.cturner56.cooperative_demo_1_device_statistics.screens.BatteryScreen
-import com.cturner56.cooperative_demo_1_device_statistics.screens.BuildScreen
-import com.cturner56.cooperative_demo_1_device_statistics.screens.DropdownMenu
-import com.cturner56.cooperative_demo_1_device_statistics.screens.FeedbackScreen
-import com.cturner56.cooperative_demo_1_device_statistics.screens.MemoryScreen
+import com.cturner56.cooperative_demo_2.navigation.BottomNav
+import com.cturner56.cooperative_demo_2.ui.theme.CooperativeDemo1DeviceStatisticsTheme
+import com.cturner56.cooperative_demo_2.destinations.Destination
+import com.cturner56.cooperative_demo_2.screens.AboutScreen
+import com.cturner56.cooperative_demo_2.screens.BatteryScreen
+import com.cturner56.cooperative_demo_2.screens.BuildScreen
+import com.cturner56.cooperative_demo_2.screens.DropdownMenu
+import com.cturner56.cooperative_demo_2.screens.FeedbackScreen
+import com.cturner56.cooperative_demo_2.screens.MemoryScreen
 
 
 class MainActivity : ComponentActivity() {
