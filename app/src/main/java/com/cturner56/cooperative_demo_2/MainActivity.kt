@@ -24,6 +24,7 @@ import com.cturner56.cooperative_demo_2.screens.BuildScreen
 import com.cturner56.cooperative_demo_2.screens.DropdownMenu
 import com.cturner56.cooperative_demo_2.screens.FeedbackScreen
 import com.cturner56.cooperative_demo_2.screens.MemoryScreen
+import com.cturner56.cooperative_demo_2.utils.ManagePermissionState
 
 
 class MainActivity : ComponentActivity() {
@@ -33,6 +34,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
            CooperativeDemo1DeviceStatisticsTheme {
+               ManagePermissionState { isGranted, requestPermission ->  }
                val navController = rememberNavController()
                Scaffold(
                    topBar = {

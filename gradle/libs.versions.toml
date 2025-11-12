@@ -13,6 +13,7 @@ protoliteWellKnownTypes = "18.0.1"
 material3 = "1.4.0"
 
 shizuku = "13.1.5"
+fragmentKtx = "1.8.9"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,6 +36,7 @@ material3 = { group = "androidx.compose.material3", name = "material3", version.
 
 shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "shizuku" }
 shizuku-provider = {  group = "dev.rikka.shizuku", name = "provider", version.ref = "shizuku" }
+androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "fragmentKtx" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
