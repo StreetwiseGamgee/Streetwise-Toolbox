@@ -53,11 +53,14 @@ class MainActivity : ComponentActivity() {
                        Spacer(modifier = Modifier.padding(10.dp))
                        NavHost(
                            navController = navController,
-                           startDestination = Destination.Battery.route,
+                           startDestination = Destination.Build.route,
                            modifier = Modifier.padding(paddingValues)
                        ) {
                            composable(Destination.Battery.route) { BatteryScreen() }
-                           composable(Destination.Build.route) { BuildScreen() }
+                           composable(Destination.Build.route) { BuildScreen(
+                               isShizukuGranted = isGranted,
+                               onRequestShizukuPermission = requestPermission
+                           )}
                            composable(Destination.Memory.route) { MemoryScreen() }
                            composable(Destination.About.route) { AboutScreen() }
                            composable(Destination.Feedback.route) { FeedbackScreen() }

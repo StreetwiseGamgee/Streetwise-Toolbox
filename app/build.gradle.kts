@@ -9,7 +9,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.cturner56.cooperative_demo_1_device_statistics"
+        applicationId = "com.cturner56.cooperative_demo_2"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -52,7 +52,6 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.protolite.well.known.types)
     implementation(libs.material3)
-    implementation(libs.androidx.fragment.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -16,13 +16,19 @@ object PermissionRequestHandler {
      *  (whether denied or granted)
      */
     fun requestHandler(onPermissionResult: (isGranted: Boolean) -> Unit) {
-        val binderListener = object : Shizuku.OnBinderReceivedListener {
-            override fun onBinderReceived() {
-                checkPermissionNow(onPermissionResult)
-                Shizuku.removeBinderReceivedListener(this)
+        // Checks if binder is already alive.
+        if (Shizuku.isPreV11() || Shizuku.getBinder() != null) {
+            // If the service is already active, check for permission.
+            checkPermissionNow(onPermissionResult)
+        } else {
+            val binderListener = object : Shizuku.OnBinderReceivedListener {
+                override fun onBinderReceived() {
+                    checkPermissionNow(onPermissionResult)
+                    Shizuku.removeBinderReceivedListener(this)
+                }
             }
+            Shizuku.addBinderReceivedListener(binderListener)
         }
-        Shizuku.addBinderReceivedListener(binderListener)
     }
 
     private fun checkPermissionNow(onPermissionResult: (isGranted: Boolean) -> Unit) {
