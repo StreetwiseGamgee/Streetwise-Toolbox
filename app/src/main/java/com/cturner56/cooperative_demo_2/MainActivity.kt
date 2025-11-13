@@ -24,6 +24,7 @@ import com.cturner56.cooperative_demo_2.screens.BuildScreen
 import com.cturner56.cooperative_demo_2.screens.DropdownMenu
 import com.cturner56.cooperative_demo_2.screens.FeedbackScreen
 import com.cturner56.cooperative_demo_2.screens.MemoryScreen
+import com.cturner56.cooperative_demo_2.utils.ManagePermissionState
 
 
 class MainActivity : ComponentActivity() {
@@ -33,41 +34,36 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
            CooperativeDemo1DeviceStatisticsTheme {
-               val navController = rememberNavController()
-               Scaffold(
-                   topBar = {
-                       TopAppBar(
-                           title = { Text("Co-op Learning Demo #2")},
-                           actions = {
-                               DropdownMenu(navController)
-                           }
-                       )
-                   },
-                   bottomBar = {
-                       BottomNav(navController = navController)
-                   }
-               ) { paddingValues ->
-                   paddingValues.calculateBottomPadding()
-                   Spacer(modifier = Modifier.padding(10.dp))
-                   NavHost(
-                       navController = navController,
-                       startDestination = Destination.Battery.route,
-                       modifier = Modifier.padding(paddingValues)
-                   ) {
-                       composable(Destination.Battery.route) {
-                           BatteryScreen()
+               ManagePermissionState { isGranted, requestPermission ->
+                   val navController = rememberNavController()
+                   Scaffold(
+                       topBar = {
+                           TopAppBar(
+                               title = { Text("Co-op Learning Demo #2")},
+                               actions = {
+                                   DropdownMenu(navController)
+                               }
+                           )
+                       },
+                       bottomBar = {
+                           BottomNav(navController = navController)
                        }
-                       composable(Destination.Build.route) {
-                           BuildScreen()
-                       }
-                       composable(Destination.Memory.route) {
-                           MemoryScreen()
-                       }
-                       composable(Destination.About.route) {
-                           AboutScreen()
-                       }
-                       composable(Destination.Feedback.route) {
-                           FeedbackScreen()
+                   ) { paddingValues ->
+                       paddingValues.calculateBottomPadding()
+                       Spacer(modifier = Modifier.padding(10.dp))
+                       NavHost(
+                           navController = navController,
+                           startDestination = Destination.Build.route,
+                           modifier = Modifier.padding(paddingValues)
+                       ) {
+                           composable(Destination.Battery.route) { BatteryScreen() }
+                           composable(Destination.Build.route) { BuildScreen(
+                               isShizukuGranted = isGranted,
+                               onRequestShizukuPermission = requestPermission
+                           )}
+                           composable(Destination.Memory.route) { MemoryScreen() }
+                           composable(Destination.About.route) { AboutScreen() }
+                           composable(Destination.Feedback.route) { FeedbackScreen() }
                        }
                    }
                }

@@ -9,7 +9,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.cturner56.cooperative_demo_1_device_statistics"
+        applicationId = "com.cturner56.cooperative_demo_2"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -59,4 +59,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation(libs.shizuku.api)
+    implementation(libs.shizuku.provider)
 }
