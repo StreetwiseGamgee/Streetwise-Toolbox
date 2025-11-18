@@ -7,14 +7,11 @@ import rikka.shizuku.ShizukuSystemProperties
 
 object ShellCmdletRepo {
     fun getKernelVersion(): String {
-        try {
-            if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
-                Log.e("CIT - ShellCmdletRepo", "Permission has not been granted.")
-                return "Shizuku permission denied"
-            }
+        return try {
+            if (isPermissionDenied()) return "Permission has not been granted"
 
-            val kernelVersion = ShizukuSystemProperties.get("ro.kernel.version", "Kernel version not known")
-            return if (kernelVersion != "Kernel version not known" && kernelVersion.isNotBlank()) {
+            val kernelVersion = ShizukuSystemProperties.get("ro.kernel.version", "")
+            if (kernelVersion.isNotBlank()) {
                 "Kernel version: $kernelVersion"
             } else {
                 Log.w("CIT - ShellCmdletRepo", "ro.kernel.version property not found.")
@@ -22,7 +19,15 @@ object ShellCmdletRepo {
             }
         } catch (e: Exception) {
             Log.e("CIT - ShellCmdletRepo", "Error getting kernel version: ${e.message}")
-            return "Error getting kernel version"
+            "Error getting kernel version"
         }
+    }
+
+    private fun isPermissionDenied(): Boolean {
+        if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
+            Log.e("CIT - ShellCmdletRepo", "Permission has not been granted.")
+            return true
+        }
+        return false
     }
 }
