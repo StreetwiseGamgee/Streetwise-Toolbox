@@ -1,4 +1,4 @@
-package com.cturner56.cooperative_demo_2.service;
+package com.cturner56.cooperative_demo_2;
 
 /*
 * IUserService:
