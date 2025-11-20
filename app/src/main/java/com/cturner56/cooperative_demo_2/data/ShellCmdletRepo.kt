@@ -1,12 +1,14 @@
 package com.cturner56.cooperative_demo_2.data
 
 import android.content.ComponentName
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.os.IBinder
 import android.util.Log
 import com.cturner56.cooperative_demo_2.IUserService
 import rikka.shizuku.Shizuku
-import rikka.shizuku.ShizukuSystemProperties
 import rikka.shizuku.Shizuku.UserServiceArgs
+import rikka.shizuku.ShizukuSystemProperties
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -18,6 +20,11 @@ object ShellCmdletRepo {
         "com.cturner56.cooperative_demo_2",
         "com.cturner56.cooperative_demo_2.service.UserService"
     )
+
+    private val deathRecipient = IBinder.DeathRecipient {
+        Log.e("CIT - ShellCmdletRepo", "The UserService has died.")
+        userService = null
+    }
 
     /**
      * Binds to the remote UserService running on Shizuku.
@@ -36,19 +43,29 @@ object ShellCmdletRepo {
             .debuggable(false)
             .version(1)
 
-        val connection = object : Shizuku.OnBinderReceivedListener {
-            override fun onBinderReceived() {
-                val binder = Shizuku.getBinder()
-                if (binder != null && binder.isBinderAlive) {
+        val connection = object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName, service: IBinder) {
+                if (service.isBinderAlive) {
                     Log.i("CIT - ShellCmdletRepo", "App has been bound to UserService")
-                    userService = IUserService.Stub.asInterface(binder)
+                    userService = IUserService.Stub.asInterface(service)
+                    try {
+                        service.linkToDeath(deathRecipient, 0)
+                    } catch (e: Exception) {
+                        Log.e("CIT - ShellCmdletRepo", "Failed to linkToDeath", e)
+                    }
                     continuation.resume(true)
                 } else {
-                    Log.e("CIT - ShellCmdletRepo", "Binder received but was null / dead.")
+                    Log.e("CIT - ShellCmdletRepo", "Binder received but was dead.")
+                    continuation.resume(false)
                 }
-               Shizuku.removeBinderReceivedListener(this)
+            }
+
+            override fun onServiceDisconnected(name: ComponentName) {
+                Log.e("CIT - ShellCmdletRepo", "The UserService has disconnected.")
+                userService = null
             }
         }
+        Shizuku.bindUserService(userServiceArgs, connection)
     }
 
     /**
