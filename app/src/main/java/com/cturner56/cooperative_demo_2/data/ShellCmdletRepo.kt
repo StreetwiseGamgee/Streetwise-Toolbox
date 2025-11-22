@@ -1,28 +1,116 @@
 package com.cturner56.cooperative_demo_2.data
 
+import android.content.ComponentName
+import android.content.ServiceConnection
 import android.content.pm.PackageManager
+import android.os.IBinder
 import android.util.Log
+import com.cturner56.cooperative_demo_2.IUserService
 import rikka.shizuku.Shizuku
+import rikka.shizuku.Shizuku.UserServiceArgs
 import rikka.shizuku.ShizukuSystemProperties
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 object ShellCmdletRepo {
-    fun getKernelVersion(): String {
-        try {
-            if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
-                Log.e("CIT - ShellCmdletRepo", "Permission has not been granted.")
-                return "Shizuku permission denied"
+    // Maintains a reference to the bound service.
+    private var userService: IUserService? = null
+
+    private val USER_SERVICE_COMPONENT_NAME = ComponentName(
+        "com.cturner56.cooperative_demo_2",
+        "com.cturner56.cooperative_demo_2.service.UserService"
+    )
+
+    private val deathRecipient = IBinder.DeathRecipient {
+        Log.e("CIT - ShellCmdletRepo", "The UserService has died.")
+        userService = null
+    }
+
+    /**
+     * Binds to the remote UserService running on Shizuku.
+     * The function will remain suspended until service is connected.
+     */
+    private suspend fun bindUserService(): Boolean = suspendCoroutine { continuation ->
+        if (userService != null) {
+            Log.d("CIT - ShellCmdletRepo", "UserService is already bound.")
+            continuation.resume(true)
+            return@suspendCoroutine
+        }
+
+        val userServiceArgs = UserServiceArgs(USER_SERVICE_COMPONENT_NAME)
+            .daemon(false)
+            .processNameSuffix(":shizuku")
+            .debuggable(false)
+            .version(1)
+
+        val connection = object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName, service: IBinder) {
+                if (service.isBinderAlive) {
+                    Log.i("CIT - ShellCmdletRepo", "App has been bound to UserService")
+                    userService = IUserService.Stub.asInterface(service)
+                    try {
+                        service.linkToDeath(deathRecipient, 0)
+                    } catch (e: Exception) {
+                        Log.e("CIT - ShellCmdletRepo", "Failed to linkToDeath", e)
+                    }
+                    continuation.resume(true)
+                } else {
+                    Log.e("CIT - ShellCmdletRepo", "Binder received but was dead.")
+                    continuation.resume(false)
+                }
             }
 
-            val kernelVersion = ShizukuSystemProperties.get("ro.kernel.version", "Kernel version not known")
-            return if (kernelVersion != "Kernel version not known" && kernelVersion.isNotBlank()) {
+            override fun onServiceDisconnected(name: ComponentName) {
+                Log.e("CIT - ShellCmdletRepo", "The UserService has disconnected.")
+                userService = null
+            }
+        }
+        Shizuku.bindUserService(userServiceArgs, connection)
+    }
+
+    /**
+     * Fetches kernel release version.
+     * Executing 'uname -r' via the UserService
+     */
+    suspend fun getUnameVersion(): String {
+        return try {
+            if (isPermissionDenied()) return "Shizuku permission is denied"
+
+            if (userService == null) {
+                if (!bindUserService()) {
+                    return "Failed to bind to UserService"
+                }
+            }
+
+            userService?.getUname() ?: "UserService is unavailable"
+        } catch (e: Exception) {
+            Log.e("CIT - ShellCmdletRepo", "Error getting uname version: ${e.message}", e)
+            "Error fetching uname release version: ${e.message}"
+        }
+    }
+
+    fun getKernelVersion(): String {
+        return try {
+            if (isPermissionDenied()) return "Permission has not been granted"
+
+            val kernelVersion = ShizukuSystemProperties.get("ro.kernel.version", "")
+            if (kernelVersion.isNotBlank()) {
                 "Kernel version: $kernelVersion"
             } else {
                 Log.w("CIT - ShellCmdletRepo", "ro.kernel.version property not found.")
                 "Kernel version not found"
             }
         } catch (e: Exception) {
-            Log.e("CIT - ShellCmdletRepo", "Error getting kernel version: ${e.message}")
-            return "Error getting kernel version"
+            Log.e("CIT - ShellCmdletRepo", "Error fetching kernel version: ${e.message}")
+            "Error fetching kernel version: ${e.message}"
         }
+    }
+
+    private fun isPermissionDenied(): Boolean {
+        if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
+            Log.e("CIT - ShellCmdletRepo", "Permission has not been granted.")
+            return true
+        }
+        return false
     }
 }

@@ -30,22 +30,32 @@ fun getBuildProps(): Map<String, String> {
         "Model" to Build.MODEL,
         "Codename" to Build.DEVICE,
         "Fingerprint" to Build.FINGERPRINT,
-        // "Hardware" to Build.HARDWARE, Fetches same value as Codename
         "Version" to Build.VERSION.RELEASE
     )
 }
+
 @Composable
 fun BuildScreen(
     isShizukuGranted: Boolean,
     onRequestShizukuPermission: () -> Unit
 ) {
-    val kernelVersion by produceState(initialValue = "Loading...?", isShizukuGranted) {
+    val kernelVersion by produceState(initialValue = "Loading...", isShizukuGranted) {
         value = if (isShizukuGranted) {
             withContext(Dispatchers.IO) {
                 ShellCmdletRepo.getKernelVersion()
             }
         } else {
-            "Shizuku not granted, please grant to see further information."
+            "Unable to fetch Kernel Version"
+        }
+    }
+
+    val unameVersion by produceState(initialValue = "Loading...", isShizukuGranted) {
+        value = if (isShizukuGranted) {
+            withContext(Dispatchers.IO) {
+                ShellCmdletRepo.getUnameVersion()
+            }
+        } else {
+            "Unable to fetch Unix Name"
         }
     }
 
@@ -69,26 +79,40 @@ fun BuildScreen(
             }
         }
 
-
-        Card(
-            modifier = Modifier
-                .padding(horizontal = 12.dp, vertical = 12.dp)
-                .fillMaxWidth()
-        ) {
-            Column(modifier = Modifier.padding(25.dp)) {
-                Text(
-                    text = kernelVersion,
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-
-                if (!isShizukuGranted) {
-                    Button(
-                        onClick = onRequestShizukuPermission,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(text = "Request Shizuku Permission")
-                    }
+        if (!isShizukuGranted) {
+            Button(
+                onClick = onRequestShizukuPermission,
+                modifier = Modifier
+                    .padding(horizontal = 12.dp, vertical = 12.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(text = "Request Shizuku Permission")
+            }
+        } else {
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp, vertical = 12.dp)
+                    .fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(25.dp)) {
+                    Text(
+                        text = kernelVersion,
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                }
+            }
+            Card(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp, vertical = 12.dp)
+                    .fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(25.dp)) {
+                    Text(
+                        text = unameVersion,
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
                 }
             }
         }

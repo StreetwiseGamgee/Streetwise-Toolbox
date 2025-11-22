@@ -8,6 +8,12 @@ android {
     namespace = "com.cturner56.cooperative_demo_2"
     compileSdk = 36
 
+    sourceSets {
+        getByName("main") {
+            aidl.srcDir("src/main/aidl")
+        }
+    }
+
     defaultConfig {
         applicationId = "com.cturner56.cooperative_demo_2"
         minSdk = 26
@@ -36,6 +42,7 @@ android {
     }
     buildFeatures {
         compose = true
+        aidl = true
     }
 }
 
