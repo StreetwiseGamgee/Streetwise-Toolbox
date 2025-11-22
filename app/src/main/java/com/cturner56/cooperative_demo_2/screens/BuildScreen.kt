@@ -30,10 +30,10 @@ fun getBuildProps(): Map<String, String> {
         "Model" to Build.MODEL,
         "Codename" to Build.DEVICE,
         "Fingerprint" to Build.FINGERPRINT,
-        // "Hardware" to Build.HARDWARE, Fetches same value as Codename
         "Version" to Build.VERSION.RELEASE
     )
 }
+
 @Composable
 fun BuildScreen(
     isShizukuGranted: Boolean,
@@ -82,13 +82,13 @@ fun BuildScreen(
         if (!isShizukuGranted) {
             Button(
                 onClick = onRequestShizukuPermission,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .padding(horizontal = 12.dp, vertical = 12.dp)
+                    .fillMaxWidth()
             ) {
                 Text(text = "Request Shizuku Permission")
             }
-        }
-
-        if (isShizukuGranted) {
+        } else {
             Card(
                 modifier = Modifier
                     .padding(horizontal = 12.dp, vertical = 12.dp)

@@ -12,7 +12,7 @@ package com.cturner56.cooperative_demo_2;
 */
 
 interface IUserService {
-    void destroy ();
-    void exit();
-    String getUname();
+    void destroy () = 16777114; // Destroy method defined by Shizuku server
+    void exit() = 1; // Exit method defined by user
+    String getUname() = 2;
 }

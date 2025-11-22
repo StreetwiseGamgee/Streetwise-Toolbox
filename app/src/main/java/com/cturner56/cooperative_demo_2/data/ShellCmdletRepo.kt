@@ -85,7 +85,7 @@ object ShellCmdletRepo {
             userService?.getUname() ?: "UserService is unavailable"
         } catch (e: Exception) {
             Log.e("CIT - ShellCmdletRepo", "Error getting uname version: ${e.message}", e)
-            "Error: ${e.message}"
+            "Error fetching uname release version: ${e.message}"
         }
     }
 
@@ -101,8 +101,8 @@ object ShellCmdletRepo {
                 "Kernel version not found"
             }
         } catch (e: Exception) {
-            Log.e("CIT - ShellCmdletRepo", "Error getting kernel version: ${e.message}")
-            "Error getting kernel version"
+            Log.e("CIT - ShellCmdletRepo", "Error fetching kernel version: ${e.message}")
+            "Error fetching kernel version: ${e.message}"
         }
     }
 
