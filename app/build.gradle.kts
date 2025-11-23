@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.devtoolsKsp)
 }
 
 android {
@@ -67,6 +68,17 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // shizuku
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
+
+    // moshi
+    implementation(libs.moshi.kotlin)
+    implementation(libs.converter.moshi)
+
+    // room
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.room.common)
+    ksp(libs.androidx.room.compiler)
 }
