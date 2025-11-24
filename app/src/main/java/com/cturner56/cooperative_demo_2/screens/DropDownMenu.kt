@@ -30,6 +30,7 @@ fun DropdownMenu(navController: NavController) {
     val ic_send = painterResource(id= R.drawable.ic_send)
     val ic_dropdown = painterResource(id= R.drawable.ic_dropdown)
     val ic_info = painterResource(id= R.drawable.ic_info)
+    val ic_repos = painterResource(id = R.drawable.ic_repos)
 
     Box(
         modifier = Modifier
@@ -56,6 +57,16 @@ fun DropdownMenu(navController: NavController) {
                 leadingIcon = { Icon(painter = ic_info, contentDescription = null) },
                 onClick = {
                     navController.navigate(Destination.About.route)
+                }
+            )
+
+            HorizontalDivider()
+
+            DropdownMenuItem(
+                text = { Text("Repository Spotlight") },
+                leadingIcon = { Icon(painter = ic_repos, contentDescription = null) },
+                onClick = {
+                    navController.navigate(Destination.RepoSpotlight.route)
                 }
             )
         }

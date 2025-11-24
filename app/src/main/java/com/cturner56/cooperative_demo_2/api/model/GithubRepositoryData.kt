@@ -29,22 +29,22 @@ import com.squareup.moshi.JsonClass
 data class GithubRepository (
     @PrimaryKey
     @Json(name = "id")
-    var id: Long = 0,
+    val id: Long = 0,
 
     @Json(name = "name")
-    var name: String = "",
+    val name: String = "",
 
     @Json(name = "full_name")
-    var fullName: String = "",
+    val fullName: String = "",
 
     @Json(name = "description")
-    var description: String = "",
+    val description: String = "",
 
     @Json(name = "stargazers_count")
-    var starCount: Int = 0,
+    val starCount: Int = 0,
 
     @Json(name = "html_url")
-    var htmlUrl: String = ""
+    val htmlUrl: String = ""
 )
 
 /**
@@ -68,20 +68,20 @@ data class GithubRepository (
 data class RepositoryReleaseVersion (
     @PrimaryKey
     @Json(name = "id")
-    var id: Long = 0,
+    val id: Long = 0,
 
-    var repoFullName: String = "",
+    val repoFullName: String = "",
 
     @Json(name = "tag_name")
-    var tagName: String = "",
+    val tagName: String = "",
 
     @Json(name = "published_at")
-    var datePublished: String = "",
+    val datePublished: String = "",
 
     @Json(name = "body")
-    var releaseNotes: String = "",
+    val releaseNotes: String = "",
 
     @Json(name = "html_url")
-    var htmlUrl: String = ""
+    val htmlUrl: String = ""
 )
 

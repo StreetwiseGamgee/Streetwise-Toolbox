@@ -24,6 +24,7 @@ import com.cturner56.cooperative_demo_2.screens.BuildScreen
 import com.cturner56.cooperative_demo_2.screens.DropdownMenu
 import com.cturner56.cooperative_demo_2.screens.FeedbackScreen
 import com.cturner56.cooperative_demo_2.screens.MemoryScreen
+import com.cturner56.cooperative_demo_2.screens.RepositoryScreen
 import com.cturner56.cooperative_demo_2.utils.ManagePermissionState
 
 
@@ -61,9 +62,11 @@ class MainActivity : ComponentActivity() {
                                isShizukuGranted = isGranted,
                                onRequestShizukuPermission = requestPermission
                            )}
+
                            composable(Destination.Memory.route) { MemoryScreen() }
                            composable(Destination.About.route) { AboutScreen() }
                            composable(Destination.Feedback.route) { FeedbackScreen() }
+                           composable(Destination.RepoSpotlight.route) { RepositoryScreen() }
                        }
                    }
                }

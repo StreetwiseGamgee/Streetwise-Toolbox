@@ -6,4 +6,5 @@ open class Destination(val route:String) {
     object Memory: Destination("Memory")
     object About: Destination("About")
     object Feedback: Destination("Feedback")
+    object RepoSpotlight: Destination("RepoSpotlight")
 }
