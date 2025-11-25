@@ -25,15 +25,14 @@ interface GithubService {
     ): GithubRepository
 
     /**
-     * Purpose - A function which retrieves details pertaining to a public Github repository.
+     * Purpose - A function which retrieves details pertaining to a repository's releases.
      * @param owner || The username affiliated to the repo.
      * @param repo || The name of the repo.
-     * @return a [RepositoryReleaseVersion] object containing relevant release details.
-     * doc-ref (loose ref) || "https://docs.github.com/en/rest/releases/releases?apiVersion=2022-11-28#get-the-latest-release"
+     * @return a [List] of [RepositoryReleaseVersion] objects containing relevant release details.
      */
-    @GET("repos/{owner}/{repo}/releases/latest")
-    suspend fun getLatestRelease(
+    @GET("repos/{owner}/{repo}/releases")
+    suspend fun getReleases(
         @Path("owner") owner: String,
         @Path("repo") repo: String
-    ) : RepositoryReleaseVersion
+    ): List<RepositoryReleaseVersion>
 }

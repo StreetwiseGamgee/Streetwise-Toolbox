@@ -38,7 +38,7 @@ data class GithubRepository (
     val fullName: String = "",
 
     @Json(name = "description")
-    val description: String = "",
+    val description: String? = "",
 
     @Json(name = "stargazers_count")
     val starCount: Int = 0,
@@ -79,7 +79,7 @@ data class RepositoryReleaseVersion (
     val datePublished: String = "",
 
     @Json(name = "body")
-    val releaseNotes: String = "",
+    val releaseNotes: String? = "",
 
     @Json(name = "html_url")
     val htmlUrl: String = ""

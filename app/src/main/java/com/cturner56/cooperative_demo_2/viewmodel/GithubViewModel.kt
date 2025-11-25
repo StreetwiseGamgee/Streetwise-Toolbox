@@ -9,6 +9,7 @@ import com.cturner56.cooperative_demo_2.api.Api
 import com.cturner56.cooperative_demo_2.api.model.GithubRepository
 import com.cturner56.cooperative_demo_2.api.model.RepositoryReleaseVersion
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import java.io.IOException
 
 /**
@@ -40,13 +41,19 @@ class GithubViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val repository = Api.retrofitService.getRepository(owner, repo)
-                val release = Api.retrofitService.getLatestRelease(owner, repo)
-
                 _repositoryState.value = repository
-                _releaseState.value = release
+
+                // Fetch the list of releases, and safely take the first one (the most recent).
+                val releases = Api.retrofitService.getReleases(owner, repo)
+                _releaseState.value = releases.firstOrNull()
+
                 _errorState.value = null // Preventing previous errors from displaying
 
                 Log.i("CIT - GithubViewModel", "Data successfully fetched or $owner/$repo")
+
+            } catch (e: HttpException) {
+                _errorState.value = "Repository retrieval failed, please refresh application."
+                Log.e("CIT - GithubViewModel", "An API Err, ${e.message}")
 
             } catch (e: IOException) {
                 // Handles network error output.
