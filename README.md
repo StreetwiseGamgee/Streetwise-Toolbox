@@ -19,15 +19,16 @@ The main purpose of this application is to provide a streamlined means of fetchi
 
 ## Dependencies
 - [Shizuku Download](https://shizuku.rikka.app/download/) - To see additional device information.
+- [Shizuku User Manual](https://shizuku.rikka.app/guide/setup/) - Setup instructions.
 
 ### Features:
 #### Battery Monitoring (WIP):
 - Currently I have basic information such as the battery's percentage, and whether it's charging or not.
 #### Build Properties / Kernel Info (WIP): 
-- I have basic buil.prop information being displayed
-- Relevant kernel information which is displayed if a user has installed Shizuku, running the service, and has granted the permission.
-Storage Information:
-
+- I have basic build.prop information being displayed.
+- Relevant kernel information is displayed if a user has installed Shizuku, the service is running, and has granted the permission.
+#### Storage Information:
+- Provides information pertaining to ram usage and storage consumption.
 
 ### Proposed Features:
 #### In-scope: 
@@ -44,4 +45,11 @@ Storage Information:
 - CPU Temp monitoring: For the same reason as battery monitoring though I am uncertain whether I have time currently.
   
 ### Installation:
+#### For developers:
+```git clone https://github.com/StreetwiseGamgee/Cooperative-Demo-1.git```
+#### For users:
+Will implement an apk for general use in the near future.
+
+### How-to Contribute:
+- Within the app there is a feedback section to which users can contact me.
 
