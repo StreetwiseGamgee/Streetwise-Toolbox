@@ -6,12 +6,22 @@
 The main purpose of this application is to provide a streamlined means of fetching device information without needing root-level access.
 
 ## Tech Used:
-<ul>
-  <li><a></a></li>
-  <li><a></a></li>
-  <li><a></a></li>
-  <li><a></a></li>
-</ul>
+### Shizuku - (Dev. [RikkaApps](https://github.com/RikkaApps))
+- A companion application which provides a means to access hidden device information.
+  - This is achieved by initiating a remote server process on the device.
+    - By doing so, we are able to execute commands with elevated privledges which normally require ADB, and or root to access.
+
+### Moshi - (Square)
+- Provides **JSON deserialization** when fetching repository information from Github's [Rest API](https://docs.github.com/en/rest?apiVersion=2022-11-28)
+  -  Used alongside Retrofit to convert the raw API responses into respective data classes.
+
+### Room-DB - (Android Jetpack) - (WIP)
+- Providing local persistence to data which is retrieved from external sources.
+  - While I have the dependencies installed, I still need to implement such. 
+
+### Firebase - (Google) - (WIP)
+- Allowing users to register and sign-in using Firebase Authentication.
+  - I don't currently have dependencies installed, and additional research is required to implement.
 
 ## Contact Info:
 - [cturner56@academic.rrc.ca](mailto:cturner56@academic.rrc.ca)
