@@ -21,7 +21,7 @@ import com.cturner56.cooperative_demo_2.destinations.Destination
 import com.cturner56.cooperative_demo_2.screens.AboutScreen
 import com.cturner56.cooperative_demo_2.screens.BatteryScreen
 import com.cturner56.cooperative_demo_2.screens.BuildScreen
-import com.cturner56.cooperative_demo_2.screens.DropdownMenu
+import com.cturner56.cooperative_demo_2.navigation.DropdownMenu
 import com.cturner56.cooperative_demo_2.screens.FeedbackScreen
 import com.cturner56.cooperative_demo_2.screens.MemoryScreen
 import com.cturner56.cooperative_demo_2.screens.RepositoryScreen

@@ -11,6 +11,12 @@ import com.cturner56.cooperative_demo_2.destinations.Destination
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 
+/**
+ * A composable which renders the bottom navigation bar of the application.
+ * Allowing the user to navigate between the three primary screens.
+ *
+ * @param navController Used to handle navigation events when a [NavigationBarItem] is clicked.
+ */
 @Composable
 fun BottomNav(navController: NavController){
     NavigationBar {
