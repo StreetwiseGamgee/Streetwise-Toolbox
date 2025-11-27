@@ -12,6 +12,17 @@ import rikka.shizuku.ShizukuSystemProperties
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
+/**
+ * Repository for executing shell commands via Shizuku UserService.
+ * The object manages the connection to Shizuku's remote IUserService.
+ * In addition the object provides methods to interact with such.
+ *
+ * Usage:
+ *      ViewModel - Utilizes the object to fetch system APIs directly.
+ * @property userService References the bound [IUserService] interface, otherwise such becomes null.
+ * @property USER_SERVICE_COMPONENT_NAME The component name for the UserService to bind to.
+ * @property deathRecipient A recipient which gets notified if the remote service is terminated.
+ */
 object ShellCmdletRepo {
     // Maintains a reference to the bound service.
     private var userService: IUserService? = null
@@ -29,6 +40,8 @@ object ShellCmdletRepo {
     /**
      * Binds to the remote UserService running on Shizuku.
      * The function will remain suspended until service is connected.
+     *
+     * @return True if the service was successfully bound.
      */
     private suspend fun bindUserService(): Boolean = suspendCoroutine { continuation ->
         if (userService != null) {
@@ -69,8 +82,10 @@ object ShellCmdletRepo {
     }
 
     /**
-     * Fetches kernel release version.
-     * Executing 'uname -r' via the UserService
+     * Fetches the kernel's release version by executing a shell command via the UserService.
+     * Prior to executing, it ensures it is connected to the aforementioned UserService.
+     *
+     * @return A string which contains the release version of the kernel, or a corresponding error.
      */
     suspend fun getUnameVersion(): String {
         return try {
@@ -89,6 +104,12 @@ object ShellCmdletRepo {
         }
     }
 
+    /**
+     * Gets the kernel version from Android's system properties.
+     * Reading from the read-only property 'ro.kernel.version'.
+     *
+     * @return A string containing the read-only property, or an error.
+     */
     fun getKernelVersion(): String {
         return try {
             if (isPermissionDenied()) return "Permission has not been granted"
@@ -106,6 +127,11 @@ object ShellCmdletRepo {
         }
     }
 
+    /**
+     * Checks if the applications has the required permission granted.
+     *
+     * @return True if the permission is denied, otherwise if it's granted it'll return true.
+     */
     private fun isPermissionDenied(): Boolean {
         if (Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED) {
             Log.e("CIT - ShellCmdletRepo", "Permission has not been granted.")
