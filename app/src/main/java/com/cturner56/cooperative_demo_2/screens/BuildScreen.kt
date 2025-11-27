@@ -19,12 +19,18 @@ import com.cturner56.cooperative_demo_2.ui.theme.CooperativeDemo1DeviceStatistic
 import androidx.compose.ui.unit.dp
 import com.cturner56.cooperative_demo_2.data.ShellCmdletRepo
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.invoke
 import kotlinx.coroutines.withContext
 
+/**
+ * Retrieves a map of essential build.props from Android's Build class.
+ * The properties provide details pertaining to the device's hardware and software.
+ *
+ * doc-ref: https://developer.android.com/reference/android/os/Build
+ *
+ * @return A map of key value pairs, IE: Manufacturer -> Google, Model -> Pixel 8
+ */
 fun getBuildProps(): Map<String, String> {
     return mapOf(
-        // https://developer.android.com/reference/android/os/Build
         "Brand" to Build.BRAND,
         "Manufacturer" to Build.MANUFACTURER,
         "Model" to Build.MODEL,
@@ -34,11 +40,23 @@ fun getBuildProps(): Map<String, String> {
     )
 }
 
+/**
+ * Main composable which is responsible for displaying Android build.props.
+ * If the Shizuku permission is granted, it will retrieve and display additional info regarding the kernel.
+ *
+ * It utilizes [produceState] to load data asynchronously from [ShellCmdletRepo] when
+ * the permission status changes.
+ *
+ * @param isShizukuGranted A bool which indicates whether the application has granted the permission.
+ * @param onRequestShizukuPermission A lambda function which is invoked when a user clicks the grant
+ * permission button.
+ */
 @Composable
 fun BuildScreen(
     isShizukuGranted: Boolean,
     onRequestShizukuPermission: () -> Unit
 ) {
+    // Fetches kernel version using Shizuku when the permission is granted.
     val kernelVersion by produceState(initialValue = "Loading...", isShizukuGranted) {
         value = if (isShizukuGranted) {
             withContext(Dispatchers.IO) {
@@ -49,6 +67,7 @@ fun BuildScreen(
         }
     }
 
+    // Fetches the uname release version using Shizuku when the permission is granted.
     val unameVersion by produceState(initialValue = "Loading...", isShizukuGranted) {
         value = if (isShizukuGranted) {
             withContext(Dispatchers.IO) {
@@ -79,6 +98,7 @@ fun BuildScreen(
             }
         }
 
+        // Conditionally displays permission request if Shizuku hasn't been granted.
         if (!isShizukuGranted) {
             Button(
                 onClick = onRequestShizukuPermission,
@@ -89,7 +109,7 @@ fun BuildScreen(
                 Text(text = "Request Shizuku Permission")
             }
         } else {
-            Card(
+            Card( // Displays read-only kernel version fetched from Shizuku.
                 modifier = Modifier
                     .padding(horizontal = 12.dp, vertical = 12.dp)
                     .fillMaxWidth()
@@ -102,7 +122,7 @@ fun BuildScreen(
                     )
                 }
             }
-            Card(
+            Card( // Displays Unix Name version fetched from Shizuku.
                 modifier = Modifier
                     .padding(horizontal = 12.dp, vertical = 12.dp)
                     .fillMaxWidth()
@@ -119,6 +139,12 @@ fun BuildScreen(
     }
 }
 
+/**
+ * A composable which is used to display build.props in a key-value pairing.
+ *
+ * @param key The property name text which is displayed on the left.
+ * @param value The property value text which is displayed on the right.
+ */
 @Composable
 fun DerivedProperty(key: String, value: String) {
     Row(
@@ -136,9 +162,13 @@ fun DerivedProperty(key: String, value: String) {
     }
 }
 
+/**
+ * A preview composable for the [BuildScreen].
+ * Providing a means to visualize the screen without running the application.
+ */
 @Preview(showBackground = true)
 @Composable
-fun BuildPropsScreenPreview() {
+fun BuildScreenPreview() {
     CooperativeDemo1DeviceStatisticsTheme {
         BuildScreen(isShizukuGranted = false, onRequestShizukuPermission = {})
     }
