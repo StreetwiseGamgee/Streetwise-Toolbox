@@ -79,6 +79,13 @@ fun RepositoryScreen(
     }
 }
 
+/**
+ * A composable function which is responsible for displaying information pertaining to a Github repository.
+ * Information is displayed in a card layout while providing hyperlinks to both the repo, and latest release.
+ *
+ * @param repository An object which contains a [GithubRepository]'s name, description, and url.
+ * @param release An optional object which contains [RepositoryReleaseVersion] pertaining to a repo.
+ */
 @Composable
 fun RepositoryCard(repository: GithubRepository, release: RepositoryReleaseVersion?) {
     Card() {
