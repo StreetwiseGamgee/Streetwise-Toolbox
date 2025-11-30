@@ -22,16 +22,40 @@ import androidx.compose.ui.unit.dp
 import com.cturner56.cooperative_demo_2.ui.theme.CooperativeDemo1DeviceStatisticsTheme
 
 private const val BYTES_PER_GIGABYTE = 1024.0 * 1024.0 * 1024.0
+
+/**
+ * A utility function which is responsible for converting bytes to gigabytes.
+ *
+ * @param bytes The number of bytes which will be converted.
+ * @return The byte value provided into gigabytes as a [Double].
+ */
 fun convertBytesToGigabytes(bytes: Long): Double {
     return bytes / BYTES_PER_GIGABYTE
 }
 
 private const val BYTES_PER_MEGABYTE = 1024.0 * 1024.0
+/**
+ * A utility function which is responsible for converting bytes to megabytes.
+ *
+ * @param bytes The number of bytes which will be converted.
+ * @return The byte value provided into megabytes as a [Double].
+ */
 fun convertBytesToMegabytes(bytes: Long): Double {
     return bytes / BYTES_PER_MEGABYTE
 }
 
-// https://developer.android.com/reference/android/app/ActivityManager.MemoryInfo
+/**
+ * A function which is responsible for retrieving the device's current memory statistics.
+ *
+ * It utilizes the [ActivityManager]'s system service to query the device for an
+ * [ActivityManager.MemoryInfo] object which contains information about the device's RAM usage such as
+ * total, available, and threshold memory.
+ *
+ * @param context The application context that is required to access the system service.
+ * @return An [ActivityManager.MemoryInfo] object with respective memory categories populated.
+ *
+ * doc-ref: https://developer.android.com/reference/android/app/ActivityManager.MemoryInfo
+ */
 fun getAvailableMemory(context: Context): ActivityManager.MemoryInfo {
     val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     val memoryInfo = ActivityManager.MemoryInfo()
@@ -39,7 +63,16 @@ fun getAvailableMemory(context: Context): ActivityManager.MemoryInfo {
     return memoryInfo
 }
 
-// https://developer.android.com/reference/android/os/StatFs
+/**
+ * A function which is responsible for calculating and formatting the device's internal storage consumption.
+ *
+ * It utilizes [StatFs] to retrieve the total, and available bytes from the device's '/data' directory.
+ * The byte values are then converted into gigabytes, and represented inside a formatted string.
+ *
+ * @return A formatted [String] which displays the device's internal storage consumption.
+ *      - Returning: Both the total storage, and storage available for use in Gigabytes.
+ * doc-ref: https://developer.android.com/reference/android/os/StatFs
+ */
 @SuppressLint("DefaultLocale")
 fun getAvailableStorage(): String {
     val path = Environment.getDataDirectory().path // Declares the internal storage path
@@ -57,6 +90,13 @@ fun getAvailableStorage(): String {
         availableGigabytes
     )
 }
+
+/**
+ * A composable function which is responsible for displaying the device's RAM information.
+ *
+ * It fetches the memory information once using [getAvailableMemory] and [remember].
+ * Once the information is retrieved, it then displays the respective memory stats in a [Card].
+ */
 @SuppressLint("DefaultLocale")
 @Composable
 fun DisplayAvailableMemory() {
@@ -64,24 +104,34 @@ fun DisplayAvailableMemory() {
     val memoryInfo: ActivityManager.MemoryInfo = remember {
         getAvailableMemory(context)
     }
-    Column {
-
+    Card {
         Text("Total RAM: ${String.format("%.2f", convertBytesToMegabytes(memoryInfo.totalMem))} MB's")
         Text("Available RAM: ${String.format("%.2f", convertBytesToMegabytes(memoryInfo.availMem))} MB's")
         Text("Threshold RAM: ${String.format("%.2f", convertBytesToMegabytes(memoryInfo.threshold))} MB's")
     }
 }
 
+/**
+ * A composable function which is responsible for displaying the device's internal storage statistics.
+ *
+ * It is fetches the formatted string once using [getAvailableStorage] and [remember].
+ * Once the information is retrieved, it then displays the respective storage stats in a [Card].
+ */
 @Composable
 fun DisplayAvailableStorage() {
     val storageInfo: String = remember {
         getAvailableStorage()
     }
-    Column {
+    Card {
         Text(storageInfo)
     }
 }
 
+/**
+ * A composable function which is responsible for displaying memory and storage details pertaining to a device.
+ *
+ * It displays both the [DisplayAvailableMemory] and [DisplayAvailableStorage] composables.
+ */
 @Composable
 fun MemoryScreen() {
     Card(
@@ -99,16 +149,16 @@ fun MemoryScreen() {
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
-            Row {
-                DisplayAvailableMemory()
-            }
-            Row {
-                DisplayAvailableStorage()
-            }
+            DisplayAvailableMemory()
+            DisplayAvailableStorage()
         }
     }
 }
 
+/**
+ * A preview composable for the [MemoryScreen].
+ * Providing a means to visualize the screen without running the application.
+ */
 @Preview(showBackground = true)
 @Composable
 fun MemoryScreenPreview() {
