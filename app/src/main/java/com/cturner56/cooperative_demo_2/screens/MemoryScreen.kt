@@ -104,10 +104,21 @@ fun DisplayAvailableMemory() {
     val memoryInfo: ActivityManager.MemoryInfo = remember {
         getAvailableMemory(context)
     }
-    Card {
-        Text("Total RAM: ${String.format("%.2f", convertBytesToMegabytes(memoryInfo.totalMem))} MB's")
-        Text("Available RAM: ${String.format("%.2f", convertBytesToMegabytes(memoryInfo.availMem))} MB's")
-        Text("Threshold RAM: ${String.format("%.2f", convertBytesToMegabytes(memoryInfo.threshold))} MB's")
+    Card (
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(25.dp)) {
+            Text(
+                text = "Memory Information",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+            Text("Total RAM: ${String.format("%.2f", convertBytesToMegabytes(memoryInfo.totalMem))} MB's")
+            Text("Available RAM: ${String.format("%.2f", convertBytesToMegabytes(memoryInfo.availMem))} MB's")
+            Text("Threshold RAM: ${String.format("%.2f", convertBytesToMegabytes(memoryInfo.threshold))} MB's")
+        }
     }
 }
 
@@ -122,36 +133,36 @@ fun DisplayAvailableStorage() {
     val storageInfo: String = remember {
         getAvailableStorage()
     }
-    Card {
-        Text(storageInfo)
+    Card (
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) {
+        Column(modifier = Modifier.padding(25.dp))
+        {
+            Text(
+                text = "Storage Information",
+                style = MaterialTheme.typography.headlineSmall,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+            Text(storageInfo)
+        }
     }
 }
 
 /**
- * A composable function which is responsible for displaying memory and storage details pertaining to a device.
- *
- * It displays both the [DisplayAvailableMemory] and [DisplayAvailableStorage] composables.
+ * A composable function which is responsible for displaying both the
+ * [DisplayAvailableMemory] and [DisplayAvailableStorage] composables.
  */
 @Composable
 fun MemoryScreen() {
-    Card(
+    Column (
         modifier = Modifier
-        .padding(12.dp)
-        .fillMaxWidth()
-    ) {
-        Column (
-            modifier = Modifier
-                .padding(25.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp))
-        {
-            Text(
-                text = "Storage & Memory Information",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-            DisplayAvailableMemory()
-            DisplayAvailableStorage()
-        }
+            .padding(25.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp))
+    {
+        DisplayAvailableMemory()
+        DisplayAvailableStorage()
     }
 }
 
