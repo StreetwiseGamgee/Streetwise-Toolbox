@@ -3,17 +3,26 @@ package com.cturner56.cooperative_demo_2.utils
 import android.content.pm.PackageManager
 import rikka.shizuku.Shizuku
 
+/**
+ * A singleton object that provides the logic for requesting the Shizuku permission.
+ *
+ * The purpose of such is to prevent the app from crashing by ensuring the
+ * Shizuku service is running prior to the permission request being sent.
+ */
 object PermissionRequestHandler {
 
     // UID integer value which is used to identify our request.
     private const val REQUEST_CODE = 8812
 
     /**
-     *  Requests Shizuku permission:
-     *  It wait's for it's service to be available before executing,
-     *  which inturn prevents runtime crashes
-     *  @param onPermissionResult calls the result of the permission request
-     *  (whether denied or granted)
+     *  A function which is responsible for safely beginning the permission check process.
+     *  Acting as the main entry point for any screen which requires Shizuku's permission.
+     *
+     *  It waits for the service to be made available before passing [onPermissionResult]
+     *  to the helper function [checkPermissionNow] which handles the permission logic further.
+     *
+     *  @param onPermissionResult A callback lambda which receives the final result from [checkPermissionNow]
+     *      - Final result: 'true' if granted, and 'false' if not.
      */
     fun requestHandler(onPermissionResult: (isGranted: Boolean) -> Unit) {
         // Checks if binder is already alive.
@@ -31,6 +40,15 @@ object PermissionRequestHandler {
         }
     }
 
+    /**
+     * A function which is responsible for performing the direct permission check, and asking the
+     * user for permission if such hasn't been granted already.
+     *
+     * The helper function assumes [requestHandler] has already been confirmed, and that the Shizuku
+     * service is already active.
+     *
+     * @param onPermissionResult The callback that's invoked with the final permission result
+     */
     private fun checkPermissionNow(onPermissionResult: (isGranted: Boolean) -> Unit) {
         if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
             onPermissionResult(true)

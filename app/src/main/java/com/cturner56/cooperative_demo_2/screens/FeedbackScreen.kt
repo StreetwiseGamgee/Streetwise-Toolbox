@@ -27,6 +27,10 @@ import androidx.core.content.ContextCompat.startActivity
 import com.cturner56.cooperative_demo_2.R
 import com.cturner56.cooperative_demo_2.ui.theme.CooperativeDemo1DeviceStatisticsTheme
 
+/**
+ * Main composable which is responsible for displaying [FeedbackSections].
+ * Users can type their feedback here, and have it submitted in their desired email client.
+ */
 @Composable
 fun FeedbackScreen(){
     Card(
@@ -49,6 +53,13 @@ fun FeedbackScreen(){
     }
 }
 
+/**
+ * Composable function which provides the UI for staging, and sending feedback via email.
+ *
+ * Fields for the subject / feedback are provided, and a button to submit.
+ * The internal state for each field is managed using [remember] and [mutableStateOf].
+ * When a user clicks "Submit Feedback" it invokes [composeEmail] to create and send the email.
+ */
 @Composable
 fun FeedbackSections() {
     var subject by remember { mutableStateOf("")}
@@ -92,6 +103,19 @@ fun FeedbackSections() {
     }
 }
 
+/**
+ * A function which is responsible for launching an email intent.
+ * Allowing users to submit their feedback through their preferred email client.
+ *
+ * The function constructs an [Intent] using [Intent.ACTION_SEND] to open the email application chosen.
+ * From there it pre-populates the respective recipient address (myself), and the user's feedback.
+ *
+ * @param context The context which is used to start the activity to open an email client.
+ * @param addresses An array of recipient email addresses.
+ * @param subject The subject line of the composed email.
+ * @param extraText The main body of the composed email.
+ *
+ */
 fun composeEmail(context: Context, addresses: Array<String>, subject: String, extraText: String) {
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "*/*"
@@ -104,6 +128,10 @@ fun composeEmail(context: Context, addresses: Array<String>, subject: String, ex
     }
 }
 
+/**
+ * A preview composable for the [FeedbackScreen].
+ * Providing a means to visualize the screen without running the application.
+ */
 @Preview(showBackground = true)
 @Composable
 fun FeedbackScreenPreview() {

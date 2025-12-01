@@ -3,9 +3,9 @@
     <string name="about_application_description">
         The main purpose of this application is to fetch device statistics, and overall health of the device.\n\n
         In the future I would like to implement...\n\n
-        1. Temperature readings for the CPU and Battery to monitor, and warn users when their device is overheating.\n
-        2. A community forum where users can discuss their findings.\n
-        3. Provide a repository of links I find useful for tinkering with Android.\n
+        1. Implement temperature readings for the battery and possibly the cpu.\n
+        2. Provide user registration / login to provide in-app updates.\n
+        3. A community forum where users can discuss their findings (Out of Scope).
     </string>
     <string name="about_developer_description">
         Hi There my name is Craig!\n\n

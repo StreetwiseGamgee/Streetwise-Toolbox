@@ -1,4 +1,4 @@
-package com.cturner56.cooperative_demo_2.screens
+package com.cturner56.cooperative_demo_2.navigation
 
 import androidx.compose.foundation.layout.Box
 import com.cturner56.cooperative_demo_2.R
@@ -8,6 +8,7 @@ import androidx.compose.material3.HorizontalDivider
 import com.cturner56.cooperative_demo_2.destinations.Destination
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,7 +20,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
-// Derived from https://developer.android.com/develop/ui/compose/components/menu
+/**
+ * A composable which provides additional screens to navigate via a dropdown menu.
+ * doc-ref: https://developer.android.com/develop/ui/compose/components/menu
+ *
+ * @param navController Used to handle navigation events when a [DropdownMenuItem] is clicked.
+ */
 @Composable
 fun DropdownMenu(navController: NavController) {
     var expanded by remember { mutableStateOf(false) }

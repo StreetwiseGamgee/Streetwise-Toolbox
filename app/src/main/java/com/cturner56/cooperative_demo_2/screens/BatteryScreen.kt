@@ -18,6 +18,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cturner56.cooperative_demo_2.ui.theme.CooperativeDemo1DeviceStatisticsTheme
 
+/**
+ * A composable which retrieves, and displays the devices current battery info.
+ * It displays battery information such as the percentage, and whether the device is charging.
+ *
+ * The function utilizes a sticky broadcast Intent...
+ * [Intent.ACTION_BATTERY_CHANGED] to attain the battery percentage and charging status.
+ */
 @Composable
 fun BatteryScreen(){
     val context = LocalContext.current
@@ -66,6 +73,10 @@ fun BatteryScreen(){
     }
 }
 
+/**
+ * A preview composable for the [BatteryScreen].
+ * Providing a means to visualize the screen without running the application.
+ */
 @Preview(showBackground = true)
 @Composable
 fun BatteryHealthScreenPreview() {

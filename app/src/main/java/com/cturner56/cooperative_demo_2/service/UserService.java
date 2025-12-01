@@ -6,17 +6,33 @@ import com.cturner56.cooperative_demo_2.IUserService;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-/*
- * UserService:
- * API-Ref:
- * https://github.com/RikkaApps/Shizuku-API/blob/a27f6e4151ba7b39965ca47edb2bf0aeed7102e5/demo/src/main/java/rikka/shizuku/demo/service/UserService.java#L12
- * Purpose: A service which runs with Shizuku's permissions to expose
- * system information by executing shell commands.
+/**
+ * A remote service which runs with Shizuku's elevated permissions to provide system information.
+ *<p>
+ *    The service is defined by the [IUserService.aidl] and is designed so that it'll be launched by
+ *    Shizuku's service.
+ *    ----
+ *    It exposes methods which make use of shell commands to retrieve device information not normally privy
+ *    to the user without direct root access or making use of a computer w/ adb access directly.
+ *    ----
+ *    doc-ref:
+ *    <a href="https://github.com/RikkaApps/Shizuku-API/blob/a27f6e4151ba7b39965ca47edb2bf0aeed7102e5/demo/src/main/java/rikka/shizuku/demo/service/UserService.java#L12">...</a>
+ *</p>
  */
 public class UserService extends IUserService.Stub {
     private static final String USER_SERVICE = "UserService";
 
-    // Method which retrieves system's kernel information by executing the command 'uname -r'
+    /**
+     * A method which is responsible for fetching the system's kernel release version.
+     * <p>
+     *     It makes use of the shell command 'uname -r' to print the release information.
+     *     ----
+     *     The output of the command is read, and subsequently returns the Unix Name (Kernel Release Ver.)
+     *     If it's unable to return a valid uname, a subsequent message is logged, and returned.
+     * </p>
+     * @return The Unix Name release version. -r being the flag which indicates release.
+     * @throws RemoteException if the process dies during the call.
+     */
     public String getUname() throws RemoteException {
         try {
             // Initiates new process to run the command.

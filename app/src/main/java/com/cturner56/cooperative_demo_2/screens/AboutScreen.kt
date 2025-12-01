@@ -16,6 +16,10 @@ import androidx.compose.ui.unit.dp
 import com.cturner56.cooperative_demo_2.R
 import com.cturner56.cooperative_demo_2.ui.theme.CooperativeDemo1DeviceStatisticsTheme
 
+/**
+ * The main composable which comprises the [AboutScreen].
+ * Displays information retrieved from [AboutDevSection] and [AboutAppSection]
+ */
 @Composable
 fun AboutScreen() {
     Column (
@@ -27,6 +31,10 @@ fun AboutScreen() {
     }
 }
 
+/**
+ * A card component which displays information about the developer.
+ * The stringResource value is pulled from /res/values/strings.xml
+ */
 @Composable
 fun AboutDevSection() {
     Card(
@@ -45,6 +53,10 @@ fun AboutDevSection() {
     }
 }
 
+/**
+* A card component which displays information about the application.
+* The stringResource value is pulled from /res/values/strings.xml
+*/
 @Composable
 fun AboutAppSection() {
     Card(
@@ -63,6 +75,10 @@ fun AboutAppSection() {
     }
 }
 
+/**
+ * A preview composable for the [AboutScreen].
+ * Providing a means to visualize the screen without running the application.
+ */
 @Preview(showBackground = true)
 @Composable
 fun AboutScreenPreview() {
