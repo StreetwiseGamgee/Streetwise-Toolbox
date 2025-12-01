@@ -11,13 +11,12 @@ import com.cturner56.cooperative_demo_2.api.model.RepositoryReleaseVersion
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
-import kotlin.collections.forEach
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 
 /**
- * Purpose - A ViewModel which exposes relevant repo information, and
- * release details for a public Github repository.
+ * A [ViewModel] which exposes relevant repo information, and release details for a public Github repository.
+ * It uses Github's Rest-API to retrieve such information.
  */
 class GithubViewModel : ViewModel() {
 
@@ -33,6 +32,7 @@ class GithubViewModel : ViewModel() {
     private val _errorState = mutableStateOf<String?>(null)
     val errorState: State<String?> = _errorState
 
+    // Predefined list of "owner/repo" which represents each repository to be featured.
     private val featuredRepositories = listOf(
         "ZG089/Re-Malwack",
         "5ec1cff/TrickyStore",
@@ -44,9 +44,20 @@ class GithubViewModel : ViewModel() {
     )
 
     /**
-     * Purpose - Fetches a predefined list of featured repositories.
-     * The function launches coroutines to fetch both repository information and release details.
-     * for each repo listed inside [featuredRepositories].
+     * A function which is responsible for retrieving repository information pertaining to repos
+     * found inside the [featuredRepositories] list.
+     *
+     * It launches a coroutine which makes two async tasks in parallel:
+     * 1. Retrieves information pertaining to the repository itself.
+     * 2. Retrieves release information pertaining to the repo.
+     *
+     * The function itself doesn't return a value directly and instead updates the [repositoryListState],
+     * [releasesState], and [errorState] props w/ the result of the network calls themselves.
+     *
+     * In the event of a network failure, a [IOException] will occur.
+     * Similarly in the event of an API error, an [HttpException] will commence.
+     *
+     * Both of these are caught internally and displayed in an [errorState] should either occur.
      */
     fun fetchFeaturedRepos() {
         viewModelScope.launch {
@@ -84,15 +95,12 @@ class GithubViewModel : ViewModel() {
                 _releasesState.value = releaseRetrieval.awaitAll().toMap()
 
             } catch (e: HttpException) {
-                //
                 _errorState.value = "Repository retrieval failed, please refresh application."
                 Log.e("CIT - GithubViewModel", "An API Error has occurred, ${e.message}")
             } catch (e: IOException) {
-                // Handles network error output.
                 _errorState.value = "Network error has occurred, please connect to the internet"
                 Log.e("CIT - GithubViewModel", "Network error has occurred, ${e.message}")
             } catch (e: Exception) {
-                //
                 _errorState.value = "Sorry, we've hit a wall. Another error has occurred ${e.message}"
                 Log.e("CIT - GithubViewModel", "An unexpected error has occurred ${e.message}")
             }
