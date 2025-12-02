@@ -3,6 +3,8 @@ package com.cturner56.cooperative_demo_2.screens
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,6 +14,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
@@ -58,16 +61,26 @@ fun BatteryScreen(){
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
-
-            Row {
-                Text("Hello, here's your current battery health!")
+            // https://developer.android.com/develop/ui/compose/animation/composables-modifiers
+            val state = remember {
+                MutableTransitionState(false).apply {
+                    // Start the animation immediately.
+                    targetState = true
+                }
             }
-            Row {
-                Text("Battery Percentage: ${batteryPct?.toInt() ?:  
-                "Cannot fetch battery percentage"}")
-            }
-            Row {
-                Text("Charging Status: ${if (isCharging) "Charging" else "Discharging"} ")
+            AnimatedVisibility(visibleState = state) {
+                Column{
+                    Row {
+                        Text("Hello, here's your current battery health!")
+                    }
+                    Row {
+                        Text("Battery Percentage: ${batteryPct?.toInt() ?:
+                        "Cannot fetch battery percentage"}")
+                    }
+                    Row {
+                        Text("Charging Status: ${if (isCharging) "Charging" else "Discharging"} ")
+                    }
+                }
             }
         }
     }

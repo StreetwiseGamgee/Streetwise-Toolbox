@@ -5,6 +5,8 @@ import android.app.ActivityManager
 import android.content.Context
 import android.os.Environment
 import android.os.StatFs
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -85,7 +87,7 @@ fun getAvailableStorage(): String {
     val availableGigabytes: Double = convertBytesToGigabytes(availableBytes)
 
     return String.format(
-        "Storage Usage: \n %.2f GB Total / %.2f GB Remaining",
+        "Internal Usage: \nTotal: %.2f GB \nRemaining: %.2f GB ",
         totalGigabytes,
         availableGigabytes
     )
@@ -115,9 +117,47 @@ fun DisplayAvailableMemory() {
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
-            Text("Total RAM: ${String.format("%.2f", convertBytesToMegabytes(memoryInfo.totalMem))} MB's")
-            Text("Available RAM: ${String.format("%.2f", convertBytesToMegabytes(memoryInfo.availMem))} MB's")
-            Text("Threshold RAM: ${String.format("%.2f", convertBytesToMegabytes(memoryInfo.threshold))} MB's")
+            // https://developer.android.com/develop/ui/compose/animation/composables-modifiers
+            val state = remember {
+                MutableTransitionState(false).apply {
+                    // Start the animation immediately.
+                    targetState = true
+                }
+            }
+            AnimatedVisibility(visibleState = state) {
+                Column {
+                    Row {
+                        Text(
+                            "Total RAM: ${
+                                String.format(
+                                    "%.2f",
+                                    convertBytesToMegabytes(memoryInfo.totalMem)
+                                )
+                            } MB's"
+                        )
+                    }
+                    Row {
+                        Text(
+                            "Available RAM: ${
+                                String.format(
+                                    "%.2f",
+                                    convertBytesToMegabytes(memoryInfo.availMem)
+                                )
+                            } MB's"
+                        )
+                    }
+                    Row {
+                        Text(
+                            "Threshold RAM: ${
+                                String.format(
+                                    "%.2f",
+                                    convertBytesToMegabytes(memoryInfo.threshold)
+                                )
+                            } MB's"
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -145,7 +185,18 @@ fun DisplayAvailableStorage() {
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.padding(bottom = 12.dp)
             )
-            Text(storageInfo)
+            // https://developer.android.com/develop/ui/compose/animation/composables-modifiers
+            val state = remember {
+                MutableTransitionState(false).apply {
+                    // Start the animation immediately.
+                    targetState = true
+                }
+            }
+            Column {
+                AnimatedVisibility(visibleState = state) {
+                    Text(storageInfo)
+                }
+            }
         }
     }
 }
