@@ -46,6 +46,13 @@ fun BatteryScreen(){
     val isCharging: Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
             || status == BatteryManager.BATTERY_STATUS_FULL
 
+    // https://developer.android.com/reference/android/os/BatteryManager#EXTRA_TEMPERATURE
+    // Inspiration:
+    // https://www.reddit.com/r/Android/comments/13yjflc/android_14_adds_new_apis_that_apps_can_use_to/
+    // https://stackoverflow.com/questions/18383581/how-get-battery-temperature-with-decimal
+    val rawTemperature: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1) ?: -1
+    val convertedTemperature = rawTemperature / 10.toFloat()
+
     Card(
         modifier = Modifier
             .padding(12.dp)
@@ -79,6 +86,9 @@ fun BatteryScreen(){
                     }
                     Row {
                         Text("Charging Status: ${if (isCharging) "Charging" else "Discharging"} ")
+                    }
+                    Row {
+                        Text("Battery temperature: $convertedTemperature°C")
                     }
                 }
             }
