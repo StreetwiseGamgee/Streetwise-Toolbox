@@ -1,6 +1,8 @@
 package com.cturner56.cooperative_demo_2.screens
 
 import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.cturner56.cooperative_demo_2.ui.theme.CooperativeDemo1DeviceStatisticsTheme
@@ -91,9 +94,21 @@ fun BuildScreen(
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
-                val properties = getBuildProps()
-                properties.forEach { (key, value) ->
-                    DerivedProperty(key, value = value)
+
+                // https://developer.android.com/develop/ui/compose/animation/composables-modifiers
+                val state = remember {
+                    MutableTransitionState(false).apply {
+                        // Start the animation immediately.
+                        targetState = true
+                    }
+                }
+                AnimatedVisibility(visibleState = state) {
+                    Column {
+                        val properties = getBuildProps()
+                        properties.forEach { (key, value) ->
+                            DerivedProperty(key, value = value)
+                        }
+                    }
                 }
             }
         }
@@ -114,12 +129,21 @@ fun BuildScreen(
                     .padding(horizontal = 12.dp, vertical = 12.dp)
                     .fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(25.dp)) {
-                    Text(
-                        text = kernelVersion,
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
+                // https://developer.android.com/develop/ui/compose/animation/composables-modifiers
+                val state = remember {
+                    MutableTransitionState(false).apply {
+                        // Start the animation immediately.
+                        targetState = true
+                    }
+                }
+                AnimatedVisibility(visibleState = state) {
+                    Column(modifier = Modifier.padding(25.dp)) {
+                        Text(
+                            text = kernelVersion,
+                            style = MaterialTheme.typography.headlineSmall,
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+                    }
                 }
             }
             Card( // Displays Unix Name version fetched from Shizuku.
@@ -127,12 +151,21 @@ fun BuildScreen(
                     .padding(horizontal = 12.dp, vertical = 12.dp)
                     .fillMaxWidth()
             ) {
-                Column(modifier = Modifier.padding(25.dp)) {
-                    Text(
-                        text = unameVersion,
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
+                // https://developer.android.com/develop/ui/compose/animation/composables-modifiers
+                val state = remember {
+                    MutableTransitionState(false).apply {
+                        // Start the animation immediately.
+                        targetState = true
+                    }
+                }
+                AnimatedVisibility(visibleState = state) {
+                    Column(modifier = Modifier.padding(25.dp)) {
+                        Text(
+                            text = unameVersion,
+                            style = MaterialTheme.typography.headlineSmall,
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        )
+                    }
                 }
             }
         }
