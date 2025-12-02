@@ -14,12 +14,17 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.cturner56.cooperative_demo_2.ui.theme.CooperativeDemo1DeviceStatisticsTheme
+import com.cturner56.cooperative_demo_2.recievers.BatteryReceiver
 
 /**
  * A composable which retrieves, and displays the devices current battery info.
@@ -31,6 +36,18 @@ import com.cturner56.cooperative_demo_2.ui.theme.CooperativeDemo1DeviceStatistic
 @Composable
 fun BatteryScreen(){
     val context = LocalContext.current
+    var batteryTemperature by remember { mutableStateOf(0.0f) }
+    DisposableEffect(context) {
+        val batteryReceiver = BatteryReceiver { temp ->
+            batteryTemperature = temp
+        }
+        val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
+        context.registerReceiver(batteryReceiver, filter)
+        onDispose {
+            context.unregisterReceiver(batteryReceiver)
+        }
+    }
+
     val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
     val batteryStatus: Intent? = context.registerReceiver(null, intentFilter)
 
@@ -45,13 +62,6 @@ fun BatteryScreen(){
     val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
     val isCharging: Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
             || status == BatteryManager.BATTERY_STATUS_FULL
-
-    // https://developer.android.com/reference/android/os/BatteryManager#EXTRA_TEMPERATURE
-    // Inspiration:
-    // https://www.reddit.com/r/Android/comments/13yjflc/android_14_adds_new_apis_that_apps_can_use_to/
-    // https://stackoverflow.com/questions/18383581/how-get-battery-temperature-with-decimal
-    val rawTemperature: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1) ?: -1
-    val convertedTemperature = rawTemperature / 10.toFloat()
 
     Card(
         modifier = Modifier
@@ -88,7 +98,7 @@ fun BatteryScreen(){
                         Text("Charging Status: ${if (isCharging) "Charging" else "Discharging"} ")
                     }
                     Row {
-                        Text("Battery temperature: $convertedTemperature°C")
+                        Text("Battery temperature: ${batteryTemperature}°C")
                     }
                 }
             }
