@@ -2,7 +2,6 @@ package com.cturner56.cooperative_demo_2.screens
 
 import android.content.Intent
 import android.content.IntentFilter
-import android.os.BatteryManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.layout.Arrangement
@@ -23,23 +22,25 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.cturner56.cooperative_demo_2.data.BatteryData
 import com.cturner56.cooperative_demo_2.ui.theme.CooperativeDemo1DeviceStatisticsTheme
-import com.cturner56.cooperative_demo_2.recievers.BatteryReceiver
+import com.cturner56.cooperative_demo_2.recievers.BatteryUpdateReceiver
 
 /**
- * A composable which retrieves, and displays the devices current battery info.
- * It displays battery information such as the percentage, and whether the device is charging.
- *
- * The function utilizes a sticky broadcast Intent...
- * [Intent.ACTION_BATTERY_CHANGED] to attain the battery percentage and charging status.
+ * A composable function which is responsible for displaying battery statistics.
+ * It registers a [BatteryUpdateReceiver] to display battery info dynamically.
+ * Making use of [DisposableEffect] to manage the lifecycle of the [BatteryUpdateReceiver]
+ * The information updates in real time as the system broadcasts
+ * ([Intent.ACTION_BATTERY_CHANGED]) are retrieved.
  */
 @Composable
 fun BatteryScreen(){
     val context = LocalContext.current
-    var batteryTemperature by remember { mutableStateOf(0.0f) }
+    var batteryData by remember { mutableStateOf(BatteryData()) }
+
     DisposableEffect(context) {
-        val batteryReceiver = BatteryReceiver { temp ->
-            batteryTemperature = temp
+        val batteryReceiver = BatteryUpdateReceiver { data ->
+            batteryData = data
         }
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         context.registerReceiver(batteryReceiver, filter)
@@ -47,21 +48,6 @@ fun BatteryScreen(){
             context.unregisterReceiver(batteryReceiver)
         }
     }
-
-    val intentFilter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
-    val batteryStatus: Intent? = context.registerReceiver(null, intentFilter)
-
-    // https://developer.android.com/training/monitoring-device-state/battery-monitoring#MonitorChargeState
-    val batteryPct: Float? = batteryStatus?.let { intent ->
-        val level: Int = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-        val scale: Int = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-        level * 100 / scale.toFloat()
-    }
-
-    // https://developer.android.com/training/monitoring-device-state/battery-monitoring#DetermineChargeState
-    val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
-    val isCharging: Boolean = status == BatteryManager.BATTERY_STATUS_CHARGING
-            || status == BatteryManager.BATTERY_STATUS_FULL
 
     Card(
         modifier = Modifier
@@ -91,14 +77,14 @@ fun BatteryScreen(){
                         Text("Hello, here's your current battery health!")
                     }
                     Row {
-                        Text("Battery Percentage: ${batteryPct?.toInt() ?:
-                        "Cannot fetch battery percentage"}")
+                        Text("Battery Percentage: ${batteryData.percentage}%")
                     }
                     Row {
-                        Text("Charging Status: ${if (isCharging) "Charging" else "Discharging"} ")
+                        Text("Charging Status: ${if (batteryData.isCharging) "Charging" 
+                        else "Discharging"} ")
                     }
                     Row {
-                        Text("Battery temperature: ${batteryTemperature}°C")
+                        Text("Battery temperature: ${String.format("%.1f", batteryData.temperature)}°C")
                     }
                 }
             }
