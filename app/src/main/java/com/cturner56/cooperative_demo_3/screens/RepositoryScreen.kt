@@ -53,27 +53,42 @@ fun RepositoryScreen(
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        if (repositories.isEmpty() && error == null) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {// Loading State.
-                CircularProgressIndicator()
-                Spacer(modifier = Modifier.height(8.dp))
-                Text("Fetching repository information, please wait.")
+        when {
+            repositories.isEmpty() && error == null -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {// Loading State.
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Fetching repository information, please wait.")
+                }
+
             }
 
-        }
+            error != null -> {
+                Column(
+                    modifier = Modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = error,
+                        color = Color.Red,
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            }
 
-        error?.let { // Error State, should information not load properly.
-            Text(text = it, color = Color.Red, style = MaterialTheme.typography.bodyLarge)
-        }
+            else -> {
 
-            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(repositories) { repo ->
-                    val release = releases[repo.fullName]
-                    RepositoryCard(repository = repo, release = release)
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(repositories) { repo ->
+                        val release = releases[repo.fullName]
+                        RepositoryCard(repository = repo, release = release)
+                    }
+                }
             }
         }
     }

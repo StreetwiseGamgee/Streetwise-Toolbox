@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Cooperative Demo 2</string>
+    <string name="app_name">Cooperative Demo 3</string>
     <string name="about_application_description">
         The main purpose of this application is to fetch device statistics, and overall health of the device.\n\n
         In the future I would like to implement...\n\n
