@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cturner56.cooperative_demo_2"
+    namespace = "com.cturner56.cooperative_demo_3"
     compileSdk = 36
 
     sourceSets {
@@ -16,11 +16,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.cturner56.cooperative_demo_2"
+        applicationId = "com.cturner56.cooperative_demo_3"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
