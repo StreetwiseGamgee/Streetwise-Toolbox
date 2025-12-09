@@ -28,6 +28,7 @@ import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cturner56.cooperative_demo_3.api.model.GithubRepository
 import com.cturner56.cooperative_demo_3.api.model.RepositoryReleaseVersion
+import com.cturner56.cooperative_demo_3.db.AppDatabase
 import com.cturner56.cooperative_demo_3.viewmodel.GithubViewModel
 
 /**
@@ -44,8 +45,11 @@ fun RepositoryScreen(
     val releases = githubViewModel.releasesState.value
     val error = githubViewModel.errorState.value
 
+    val context = LocalContext.current
+    val githubDao = AppDatabase.getInstance(context).githubDao()
+
     LaunchedEffect(key1 = true) {
-        githubViewModel.fetchFeaturedRepos()
+        githubViewModel.fetchFeaturedRepos(githubDao)
     }
 
     Column(
@@ -60,9 +64,9 @@ fun RepositoryScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {// Loading State.
-                    CircularProgressIndicator()
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Fetching repository information, please wait.")
+//                    CircularProgressIndicator()
+//                    Spacer(modifier = Modifier.height(8.dp))
+//                    Text("Fetching repository information, please wait.")
                 }
 
             }
