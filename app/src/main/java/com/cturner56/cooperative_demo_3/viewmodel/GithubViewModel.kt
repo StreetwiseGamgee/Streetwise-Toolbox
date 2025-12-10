@@ -71,7 +71,7 @@ class GithubViewModel : ViewModel() {
             val wasRefreshSuccessful = refreshFromNetwork(githubDao)
 
             if (!wasRefreshSuccessful) {
-                _errorState.value = " Unable to refresh online content,\n displaying offline data."
+                _errorState.value = "[OFFLINE]\nDisplaying Local Information"
             }
         }
     }
