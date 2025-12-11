@@ -21,6 +21,13 @@ import com.cturner56.cooperative_demo_3.api.model.RepositoryReleaseVersion
  */
 @Dao
 interface GithubDao {
+    /**
+     * Inserts a single [GithubRepository] into the 'github_repos table.
+     *
+     * @param repo the [GithubRepository] object to be inserted or replaced (Should it exist).
+     */
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertRepository(repo: GithubRepository)
 
     /**
      * Inserts a list of [GithubRepository] objects into the 'github_repos' table.

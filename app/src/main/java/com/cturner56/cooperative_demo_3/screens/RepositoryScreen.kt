@@ -14,8 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,8 +39,15 @@ import com.cturner56.cooperative_demo_3.utils.NetworkStatus
 import com.cturner56.cooperative_demo_3.viewmodel.GithubViewModel
 import com.cturner56.cooperative_demo_3.R
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.TextFieldValue
 
 /**
  * Purpose - A composable function which renders a Github repositories.
@@ -53,6 +64,42 @@ import androidx.compose.ui.res.painterResource
 fun RepositoryScreen(
     githubViewModel: GithubViewModel = viewModel()
 ) {
+    var showDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = { showDialog = true }) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_add_repo),
+                    contentDescription = "Add repository",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    ) { innerPadding ->
+
+        ListRepositoryContent(
+            githubViewModel = githubViewModel,
+            modifier = Modifier.padding(innerPadding)
+        )
+
+        if (showDialog) {
+            AddRepositoryDialog(
+                onDismiss = { showDialog = false},
+                onConfirm = {owner, repoName ->
+                    showDialog = false
+                    val dao = AppDatabase.getInstance(context).githubDao()
+                    githubViewModel.addUserDefinedRepo(owner, repoName, dao)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun ListRepositoryContent(githubViewModel: GithubViewModel, modifier: Modifier = Modifier) {
+
     // Listens to state from view model
     val repositories = githubViewModel.repositoryListState.value
     val releases = githubViewModel.releasesState.value
@@ -61,6 +108,7 @@ fun RepositoryScreen(
     val context = LocalContext.current
     val githubDao = AppDatabase.getInstance(context).githubDao()
 
+    // Triggers initial data retrieval when composable first enters composition.
     LaunchedEffect(key1 = true) {
         githubViewModel.fetchFeaturedRepos(githubDao)
     }
@@ -72,19 +120,20 @@ fun RepositoryScreen(
     ) {
         val isLoading = repositories.isEmpty() && error == null
         when {
-            isLoading -> {
+            isLoading -> { // Displays spinner when it initially fetched data.
                 Column(
                     modifier = Modifier.fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {// Loading State.
-                        CircularProgressIndicator()
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("Fetching repository information, please wait.")
+                    CircularProgressIndicator()
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text("Fetching repository information, please wait.")
                 }
             }
-            repositories.isNotEmpty() -> {
-                if (error != null ) {
+
+            repositories.isNotEmpty() || error != null -> {
+                if (error != null) {
                     Text(
                         text = error,
                         color = MaterialTheme.colorScheme.primary, // Fixes Accessibility
@@ -92,29 +141,64 @@ fun RepositoryScreen(
                     )
                 }
 
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(repositories) { repo ->
-                        val release = releases[repo.fullName]
-                        RepositoryCard(repository = repo, release = release)
+                if (repositories.isNotEmpty()) {
+                    LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        items(repositories) { repo ->
+                            val release = releases[repo.fullName]
+                            RepositoryCard(repository = repo, release = release)
+                        }
                     }
-                }
-            }
-
-            error != null -> {
-                Column(
-                    modifier = Modifier.fillMaxSize(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = error,
-                        color = Color.Red,
-                        style = MaterialTheme.typography.bodyLarge
-                    )
                 }
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AddRepositoryDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (owner: String, repoName: String) -> Unit
+) {
+    var owner by remember { mutableStateOf(TextFieldValue("")) }
+    var repoName by remember { mutableStateOf(TextFieldValue("")) }
+    val userSubmissionAccess = owner.text.isNotBlank() && repoName.text.isNotBlank()
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Add new repository") },
+        text = {
+            Column {
+                    OutlinedTextField(
+                        value = owner,
+                        onValueChange = { owner = it },
+                        label = { Text("Owner example: 'RikkaApps'")},
+                        singleLine = true
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    OutlinedTextField(
+                        value = repoName,
+                        onValueChange = { repoName = it },
+                        label = { Text("Repo example: 'Shizuku'")},
+                        singleLine = true
+                    )
+                }
+            },
+        confirmButton = {
+            Button(
+                onClick = { onConfirm(owner.text.trim(), repoName.text.trim()) },
+                enabled = userSubmissionAccess
+            ) {
+                Text("Add Submission")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Cancel Submission")
+            }
+        }
+    )
 }
 
 /**

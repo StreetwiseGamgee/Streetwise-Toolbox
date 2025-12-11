@@ -77,6 +77,40 @@ class GithubViewModel : ViewModel() {
     }
 
     /**
+     * A function which is responsible for fetching a single repository from GitHub's API.
+     * Based on user input it will then add such to the local database.
+     *
+     * After subsequent data retrieval, it triggers a reload all data by calling [fetchFeaturedRepos]
+     * In the event a repository cannot be retrieved,
+     * or a network error occurs the [errorState] is updated.
+     *
+     * @param owner The username associated with a repository.
+     * @param repoName The name of the GitHub repository.
+     * @param githubDao The DAO responsible for database operations.
+     */
+    fun addUserDefinedRepo(owner: String, repoName: String, githubDao: GithubDao) {
+        viewModelScope.launch {
+            try {
+                // Fetches the repository information from the network.
+                val newlyInsertedRepo = withContext(Dispatchers.IO) {
+                    Api.retrofitService.getRepository(owner = owner, repo = repoName)
+                }
+                // Saves fetched repository information into Room-db.
+                withContext(Dispatchers.IO) {
+                    githubDao.insertRepository(newlyInsertedRepo)
+                    Log.d("CIT - GithubViewModel", "${newlyInsertedRepo.fullName} Added to database.")
+                }
+
+                fetchFeaturedRepos(githubDao) // Re-run fetch logic to update UI
+                _errorState.value = null // Clear previous errors.
+            } catch (e: Exception) {
+                Log.e("CIT - GithubViewModel", "Failed to add $owner/$repoName", e)
+                _errorState.value = "Couldn't fetch information pertaining to $owner/$repoName."
+            }
+        }
+    }
+
+    /**
      *  A function which attempts to retrieve cached repository information from the
      *  local Room database. If data is found, [repositoryListState] and [releasesState] are displayed.
      *
@@ -123,9 +157,18 @@ class GithubViewModel : ViewModel() {
     private suspend fun refreshFromNetwork(githubDao: GithubDao): Boolean {
         return try {
             _errorState.value = null // Clears any existing error messages.
+
+            var refreshedRepositories = withContext(Dispatchers.IO) {
+                githubDao.getAllRepositories().map {it.fullName}
+            }
+
+            if (refreshedRepositories.isEmpty()) {
+                refreshedRepositories = featuredRepositories
+            }
+
             // Creates a list of async jobs for each repository.
             val repositories = withContext(Dispatchers.IO) {
-                val repositoryRetrieval = featuredRepositories.map { fullName ->
+                val repositoryRetrieval = refreshedRepositories.map { fullName ->
                     async {
                         try {
                             val (owner, repo) = fullName.split("/")
@@ -170,7 +213,7 @@ class GithubViewModel : ViewModel() {
                 Log.d(
                     "CIT - GithubViewModel",
                     "Information successfully retrieved from online sources, " +
-                            "updated local cache with ${repositories.size} repos!"
+                    "updated local cache with ${repositories.size} repos!"
                 )
             }
             true
