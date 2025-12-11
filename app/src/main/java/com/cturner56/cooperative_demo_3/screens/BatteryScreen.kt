@@ -8,12 +8,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -25,22 +27,47 @@ import androidx.compose.ui.unit.dp
 import com.cturner56.cooperative_demo_3.data.BatteryData
 import com.cturner56.cooperative_demo_3.ui.theme.CooperativeDemo1DeviceStatisticsTheme
 import com.cturner56.cooperative_demo_3.recievers.BatteryUpdateReceiver
+import com.patrykandpatrick.vico.compose.axis.horizontal.rememberBottomAxis
+import com.patrykandpatrick.vico.compose.axis.vertical.rememberStartAxis
+import com.patrykandpatrick.vico.compose.chart.Chart
+import com.patrykandpatrick.vico.compose.chart.line.lineChart
+import com.patrykandpatrick.vico.core.entry.ChartEntryModelProducer
+import com.patrykandpatrick.vico.core.entry.entryOf
+
+const val MAX_TEMPERATURE_ENTRIES = 20
 
 /**
  * A composable function which is responsible for displaying battery statistics.
  * It registers a [BatteryUpdateReceiver] to display battery info dynamically.
- * Making use of [DisposableEffect] to manage the lifecycle of the [BatteryUpdateReceiver]
- * The information updates in real time as the system broadcast ([Intent.ACTION_BATTERY_CHANGED])
- * is received.
+ * The screen displays the battery's percentage, charging status, and temperature.
+ *
+ * Additionally, it maintains a history of recent temperature readings and
+ * displays them in a live-graph. The graph is created using Vico charting library
+ * which allows for the visualization of fluctuations in temperature over a period of time.
+ *
+ * Making use of [DisposableEffect] to manage the lifecycle of the [BatteryUpdateReceiver] ensures
+ * the reciever is only registered when the composable is active. Otherwise, it's unregistered and
+ * disposed of. The information updates in real time as the
+ * system broadcast ([Intent.ACTION_BATTERY_CHANGED]) is received.
  */
 @Composable
 fun BatteryScreen(){
     val context = LocalContext.current
+    var temperatureHistory by remember { mutableStateOf(listOf<Float>()) }
     var batteryData by remember { mutableStateOf(BatteryData()) }
+
+    val chartModelProducer = remember { ChartEntryModelProducer() }
+
+    LaunchedEffect(temperatureHistory) {
+        val temperatureReadings = temperatureHistory.mapIndexed { index, temp -> entryOf(index, temp) }
+        chartModelProducer.setEntries(temperatureReadings)
+    }
 
     DisposableEffect(context) {
         val batteryReceiver = BatteryUpdateReceiver { data ->
             batteryData = data
+            // Update temperature history list.
+            temperatureHistory = (temperatureHistory + data.temperature).takeLast(MAX_TEMPERATURE_ENTRIES)
         }
         val filter = IntentFilter(Intent.ACTION_BATTERY_CHANGED)
         context.registerReceiver(batteryReceiver, filter)
@@ -86,6 +113,19 @@ fun BatteryScreen(){
                     Row {
                         Text("Battery temperature: ${String.format("%.1f", batteryData.temperature)}°C")
                     }
+
+                    Text(
+                        text = "Battery Temperature Fluctuations (°C)",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(top = 20.dp, bottom = 12.dp)
+                    )
+                    Chart(
+                        chart = lineChart(),
+                        chartModelProducer = chartModelProducer,
+                        startAxis = rememberStartAxis(),
+                        bottomAxis = rememberBottomAxis(),
+                        modifier = Modifier.height(200.dp)
+                    )
                 }
             }
         }

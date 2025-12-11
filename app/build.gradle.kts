@@ -72,6 +72,9 @@ dependencies {
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
 
+    // vico
+    implementation(libs.vico.compose.m3)
+
     // moshi
     implementation(libs.moshi.kotlin)
     implementation(libs.converter.moshi)
