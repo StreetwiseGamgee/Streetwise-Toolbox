@@ -28,8 +28,8 @@ object ShellCmdletRepo {
     private var userService: IUserService? = null
 
     private val USER_SERVICE_COMPONENT_NAME = ComponentName(
-        "com.cturner56.cooperative_demo_3",
-        "com.cturner56.cooperative_demo_3.service.UserService"
+        "com.cturner56.streetwise_toolbox",
+        "com.cturner56.streetwise_toolbox.service.UserService"
     )
 
     private val deathRecipient = IBinder.DeathRecipient {

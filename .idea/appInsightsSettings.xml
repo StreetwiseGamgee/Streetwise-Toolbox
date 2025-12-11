@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.cturner56.streetwise_toolbox" />
+                  <option name="mobileSdkAppId" value="1:377482797690:android:a6499a85f5708c06e151c3" />
+                  <option name="projectId" value="streetwise-toolbox" />
+                  <option name="projectNumber" value="377482797690" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
