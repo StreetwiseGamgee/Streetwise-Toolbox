@@ -88,7 +88,7 @@ class GithubViewModel : ViewModel() {
      * @param repoName The name of the GitHub repository.
      * @param githubDao The DAO responsible for database operations.
      */
-    fun addUserDefinedRepo(owner: String, repoName: String, githubDao: GithubDao) {
+    fun addRepository(owner: String, repoName: String, githubDao: GithubDao) {
         viewModelScope.launch {
             try {
                 // Fetches the repository information from the network.
@@ -106,6 +106,35 @@ class GithubViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("CIT - GithubViewModel", "Failed to add $owner/$repoName", e)
                 _errorState.value = "Couldn't fetch information pertaining to $owner/$repoName."
+            }
+        }
+    }
+
+    /**
+     * A function which is responsible for concurrently deleting release information,
+     * and repository information from the local database.
+     *
+     * Subsequently, it reloads data from the cache to update the UI immediately.
+     *
+     * @param repository The [GithubRepository] object to be deleted.
+     * @param githubDao The DAO responsible for database operations.
+     */
+    fun deleteRepository(repository: GithubRepository, githubDao: GithubDao) {
+        viewModelScope.launch {
+            try {
+                // Saves fetched repository information into Room-db.
+                withContext(Dispatchers.IO) {
+                    githubDao.deleteReleasesForRepository(repository.fullName)
+                    githubDao.deleteRepository(repository)
+                    Log.d("CIT - GithubViewModel", "${repository.fullName} " +
+                            "Purged from database.")
+                }
+
+                loadFromCache(githubDao) // Re-run fetch logic to update UI
+                _errorState.value = null // Clear previous errors.
+            } catch (e: Exception) {
+                Log.e("CIT - GithubViewModel", "Failed to remove ${repository.fullName}", e)
+                _errorState.value = "Couldn't remove information pertaining to ${repository.fullName}."
             }
         }
     }

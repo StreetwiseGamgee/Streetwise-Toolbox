@@ -1,6 +1,7 @@
 package com.cturner56.cooperative_demo_3.db
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -16,7 +17,7 @@ import com.cturner56.cooperative_demo_3.api.model.RepositoryReleaseVersion
  *
  * [GithubRepository]
  *      and
- * [RepositoryReleaseVersion] 's data classes are used in storing, updating and querying data.
+ * [RepositoryReleaseVersion] 's data classes are used in storing, updating, and querying data.
  *
  */
 @Dao
@@ -61,4 +62,15 @@ interface GithubDao {
      */
     @Query("SELECT * FROM github_releases WHERE repoFullName = :repoFullName")
     suspend fun getReleasesForRepository(repoFullName: String): List<RepositoryReleaseVersion>
+
+    /**
+     * Deletes a single instance of a GitHub repository from the 'github_repos' table.
+     *
+     * @param repo the [GithubRepository] object which is to be deleted.
+     */
+    @Delete
+    suspend fun deleteRepository(repo: GithubRepository)
+
+    @Query("DELETE FROM github_releases WHERE repoFullName = :repoFullName")
+    suspend fun deleteReleasesForRepository(repoFullName: String)
 }

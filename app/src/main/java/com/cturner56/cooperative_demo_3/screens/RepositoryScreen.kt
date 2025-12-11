@@ -25,7 +25,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -39,6 +38,7 @@ import com.cturner56.cooperative_demo_3.utils.NetworkStatus
 import com.cturner56.cooperative_demo_3.viewmodel.GithubViewModel
 import com.cturner56.cooperative_demo_3.R
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.getValue
@@ -50,15 +50,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.TextFieldValue
 
 /**
- * Purpose - A composable function which renders a Github repositories.
- * It observes the state from the [GithubViewModel] to display content.
+ * Purpose - A composable function manages the overall UI layout and user-interactions.
  *
- * A loading indicator will remain should the device not have a local cache or...
- * The device is disconnected from the internet!
+ * Utilizing a [Scaffold] it provides the layout structure which includes a [FloatingActionButton]
+ * to add new GitHub repositories. When the action button is clicked, a [AddRepositoryDialog] will
+ * pop-up and prompt a user to fill in repository information such as the owner and repo name.
  *
- * Data retrieval is triggered by a [LaunchedEffect] when the screen is composed.
- *
- * @param githubViewModel - Responsible for fetching, and holding repository information.
+ * @param githubViewModel - Responsible for fetching and holding repository information.
  */
 @Composable
 fun RepositoryScreen(
@@ -90,13 +88,24 @@ fun RepositoryScreen(
                 onConfirm = {owner, repoName ->
                     showDialog = false
                     val dao = AppDatabase.getInstance(context).githubDao()
-                    githubViewModel.addUserDefinedRepo(owner, repoName, dao)
+                    githubViewModel.addRepository(owner, repoName, dao)
                 }
             )
         }
     }
 }
 
+/**
+ * A function which is responsible for handling the UI-state for loading and errors.
+ *
+ * It observes the state from the [GithubViewModel] to show...
+ * 1. A loading indicator upon initial retrieval.
+ * 2. A list of repositories (whether cached or retrieved)
+ * 3. A corresponding error message if applicable.
+ * Data retrieval is triggered by [LaunchedEffect] when the composable initially enters composition.
+ *
+ * @param githubViewModel The ViewModel instance which is responsible for providing the data.
+ */
 @Composable
 fun ListRepositoryContent(githubViewModel: GithubViewModel, modifier: Modifier = Modifier) {
 
@@ -104,7 +113,6 @@ fun ListRepositoryContent(githubViewModel: GithubViewModel, modifier: Modifier =
     val repositories = githubViewModel.repositoryListState.value
     val releases = githubViewModel.releasesState.value
     val error = githubViewModel.errorState.value
-
     val context = LocalContext.current
     val githubDao = AppDatabase.getInstance(context).githubDao()
 
@@ -145,7 +153,13 @@ fun ListRepositoryContent(githubViewModel: GithubViewModel, modifier: Modifier =
                     LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         items(repositories) { repo ->
                             val release = releases[repo.fullName]
-                            RepositoryCard(repository = repo, release = release)
+                            RepositoryCard(
+                                repository = repo,
+                                release = release,
+                                onDelete = {
+                                    githubViewModel.deleteRepository(repo, githubDao)
+                                }
+                            )
                         }
                     }
                 }
@@ -155,6 +169,13 @@ fun ListRepositoryContent(githubViewModel: GithubViewModel, modifier: Modifier =
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+/**
+ * A composable which is responsible for displaying a pop-up dialog which allows the user to add a
+ * GitHub repository via it's owner's name, and the repository name.
+ *
+ * @param onDismiss A Lambda function which is invoked when a user dismisses the dialog.
+ * @param onConfirm A Lambda function which is invoked with the corresponding inputs 'owner/repo'.
+ */
 @Composable
 private fun AddRepositoryDialog(
     onDismiss: () -> Unit,
@@ -214,50 +235,65 @@ private fun AddRepositoryDialog(
  * @param release An optional object which contains [RepositoryReleaseVersion]
  * - Date Published: The corresponding date and time of publication.
  * - Tag Name: The 'tag' associated with a release version i.e 'v.4.4-inject-s'
+ *
+ * @param onDelete A lambda function which is invoked when the delete icon is clicked.
  */
 @Composable
-fun RepositoryCard(repository: GithubRepository, release: RepositoryReleaseVersion?) {
-    val parts = repository.fullName.split('/').take(2)
-    val owner = parts.getOrNull(0)
-    val repositoryName = parts.getOrNull(1)
+fun RepositoryCard(
+    repository: GithubRepository,
+    release:
+    RepositoryReleaseVersion?,
+    onDelete: () -> Unit
+    ) {
+        val parts = repository.fullName.split('/').take(2)
+        val owner = parts.getOrNull(0)
+        val repositoryName = parts.getOrNull(1)
 
-    Card() {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_star),
-                    contentDescription = "Star count",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                Spacer(modifier = Modifier.width(4.dp))
+        Card() {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_star),
+                        contentDescription = "Star count",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = repository.starCount.toString() + " Stars",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.width(12.dp))
+                    IconButton(onClick = onDelete){
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_delete_repo),
+                            contentDescription = "Delete repository",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
                 Text(
-                    text = repository.starCount.toString() + " Stars",
-                    style = MaterialTheme.typography.bodyMedium
+                    text = repository.fullName,
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
                 )
+                Text(
+                    text = repository.description ?: "No description provided.",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+
+                Spacer(modifier = Modifier.height(4.dp)) // Divider between repository and release info.
+
+                if (owner != null && repositoryName != null ) {
+                    HyperLinkText(url = repository.htmlUrl,
+                        label = "View $owner's repository $repositoryName")
+                }
+
             }
-            Text(
-                text = repository.fullName,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
-            )
-            Text(
-                text = repository.description ?: "No description provided.",
-                style = MaterialTheme.typography.bodyLarge
-            )
-
-            Spacer(modifier = Modifier.height(4.dp)) // Divider between repository and release info.
-
-            if (owner != null && repositoryName != null ) {
-                HyperLinkText(url = repository.htmlUrl,
-                    label = "View $owner's repository $repositoryName")
-            }
-
-        }
         release?.let { release ->
             Column(
                 modifier = Modifier
