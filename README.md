@@ -11,13 +11,14 @@ The main purpose of this application is to provide a streamlined means of fetchi
   - This is achieved by initiating a remote server process on the device.
     - By doing so, we are able to execute commands with elevated privileges which normally require ADB, and or root to access.
 
+- Licensed under the [MIT License](LICENSE), Copyright (c) 2021 RikkaW.
+
 ### Moshi - (Square)
 - Provides **JSON deserialization** when fetching repository information from Github's [Rest API](https://docs.github.com/en/rest?apiVersion=2022-11-28)
   -  Used alongside Retrofit to convert the raw API responses into respective data classes.
 
-### Room-DB - (Android Jetpack) - (WIP)
-- Providing local persistence to data which is retrieved from external sources.
-  - While I have the dependencies installed, I still need to implement such. 
+### Room-DB - (Android Jetpack)
+- Providing local persistence to data which is retrieved from GitHub's Restful API.
 
 ### Firebase - (Google) - (WIP)
 - Allowing users to register and sign-in using Firebase Authentication.
@@ -29,17 +30,22 @@ The main purpose of this application is to provide a streamlined means of fetchi
 
 ### Features:
 #### Battery Monitoring (WIP):
-- Currently I have basic information such as the battery's percentage, and whether it's charging or not.
+- Currently I have basic information such as the battery's percentage, whether it's charging, and the internal temperature.
 #### Build Properties / Kernel Info (WIP): 
 - I have basic build.prop information being displayed.
 - Relevant kernel information is displayed if a user has installed Shizuku, the service is running and has granted the permission.
 #### Storage Information:
 - Provides information pertaining to ram usage and storage consumption.
+#### Repository Spotlight
+- Provides a space where users can discover repositories pertaining to root-related modules.
+  - Allowing users to navigate to both the respective GitHub repositories, and releases via hyperlinks.
+    - Information is retrieved using GitHub's Restful API over the network, and subsequently stored locally. 
+  - In addition to such, users are able to insert and delete entries. 
 
 ### Proposed Features:
 #### In-scope: 
 ##### Battery Health (Extended):
-- Provide a means to check the temperature of the device's battery.
+- ~~Provide a means to check the temperature of the device's battery~~ (Completed).
 - Implement a graph-chart visual to represent the fluctuations or differences in real-time.
 
 ##### User Registry / Account Login:
