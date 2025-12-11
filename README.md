@@ -46,7 +46,7 @@ The main purpose of this application is to provide a streamlined means of fetchi
 #### In-scope: 
 ##### Battery Health (Extended):
 - ~~Provide a means to check the temperature of the device's battery~~ (Completed).
-- Implement a graph-chart visual to represent the fluctuations or differences in real-time.
+- ~~Implement a graph-chart visual to represent the fluctuations or differences in real-time.~~ (Completed)
 
 ##### User Registry / Account Login:
 - Provide a means of account registry and authentication.
