@@ -13,6 +13,7 @@ protoliteWellKnownTypes = "18.0.1"
 material3 = "1.4.0"
 
 shizuku = "13.1.5"
+vico = "1.14.0"
 moshiKotlin = "1.9.3"
 converterMoshi = "2.9.0"
 ksp="2.1.0-1.0.29"
@@ -40,6 +41,9 @@ material3 = { group = "androidx.compose.material3", name = "material3", version.
 # Shizuku libs
 shizuku-api = { group = "dev.rikka.shizuku", name = "api", version.ref = "shizuku" }
 shizuku-provider = {  group = "dev.rikka.shizuku", name = "provider", version.ref = "shizuku" }
+
+# Vico libs
+vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 
 # Moshi libs
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshiKotlin" }

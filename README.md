@@ -11,7 +11,7 @@ The main purpose of this application is to provide a streamlined means of fetchi
   - This is achieved by initiating a remote server process on the device.
     - By doing so, we are able to execute commands with elevated privileges which normally require ADB, and or root to access.
 
-- Licensed under the [MIT License](LICENSE), Copyright (c) 2021 RikkaW.
+- Licensed under the [MIT License](app/src/main/assets/LICENSE), Copyright (c) 2021 RikkaW.
 
 ### Moshi - (Square)
 - Provides **JSON deserialization** when fetching repository information from Github's [Rest API](https://docs.github.com/en/rest?apiVersion=2022-11-28)
