@@ -12,4 +12,5 @@ open class Destination(val route:String) {
     object About: Destination("About")
     object Feedback: Destination("Feedback")
     object RepoSpotlight: Destination("RepoSpotlight")
+    object LoginScreen: Destination("Login")
 }

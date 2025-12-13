@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -27,6 +28,7 @@ import com.cturner56.streetwise_toolbox.screens.BatteryScreen
 import com.cturner56.streetwise_toolbox.screens.BuildScreen
 import com.cturner56.streetwise_toolbox.navigation.DropdownMenu
 import com.cturner56.streetwise_toolbox.screens.FeedbackScreen
+import com.cturner56.streetwise_toolbox.screens.LoginScreen
 import com.cturner56.streetwise_toolbox.screens.MemoryScreen
 import com.cturner56.streetwise_toolbox.screens.RepositoryScreen
 import com.cturner56.streetwise_toolbox.utils.ManagePermissionState
@@ -49,7 +51,10 @@ class MainActivity : ComponentActivity() {
                    startDestination = startDestination
                ) {
                    composable("LoginScreen") {
-//                       LoginScreen(navController = navController, authViewModel = authViewModel)
+                       LoginScreen(navController = navController, authViewModel = authViewModel)
+                   }
+                   composable("MainScaffold") {
+                       MainActivityScaffold(mainNavController = navController)
                    }
                }
            }
@@ -59,7 +64,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainActivityScaffold(navController: androidx.navigation.NavController) {
+fun MainActivityScaffold(mainNavController: NavController) {
     ManagePermissionState { isGranted, requestPermission ->
         val innerNavController = rememberNavController()
         Scaffold(
@@ -67,12 +72,12 @@ fun MainActivityScaffold(navController: androidx.navigation.NavController) {
                 TopAppBar(
                     title = { Text("Streetwise's Toolbox")},
                     actions = {
-                        DropdownMenu(innerNavController)
+                        DropdownMenu(mainNavController)
                     }
                 )
             },
             bottomBar = {
-                BottomNav(navController = innerNavController)
+                BottomNav(navController = mainNavController)
             }
         ) { paddingValues ->
             paddingValues.calculateBottomPadding()

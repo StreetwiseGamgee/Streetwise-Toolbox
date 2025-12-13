@@ -88,5 +88,16 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.common)
+
+    // firebase
+    implementation(libs.firebase.auth)
+
+    // credentials
+    implementation(libs.androidx.credentials)
+
+    // google
+    implementation(libs.androidx.credentials.play.services.auth)
+    implementation(libs.googleid)
+
     ksp(libs.androidx.room.compiler)
 }
