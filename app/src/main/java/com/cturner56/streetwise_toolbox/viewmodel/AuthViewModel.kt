@@ -21,6 +21,7 @@ sealed class SignInState {
     object Loading : SignInState()
     data class Success(val authResult: AuthResult) : SignInState()
     data class Error(val message: String) : SignInState()
+    object GuestSuccess : SignInState()
 }
 
 /**
@@ -34,6 +35,9 @@ class AuthViewModel : ViewModel() {
     private val _isAuthenticated = MutableStateFlow(auth.currentUser != null) // Checks current user
     val isAuthenticated = _isAuthenticated.asStateFlow()
 
+    private val _isGuestMode = MutableStateFlow(false)
+    val isGuestMode = _isGuestMode.asStateFlow()
+
     private val _signInState = MutableStateFlow<SignInState>(SignInState.Idle) // Holds current state
     val signInState = _signInState.asStateFlow()
 
@@ -43,6 +47,7 @@ class AuthViewModel : ViewModel() {
             task.addOnSuccessListener { authResult ->
                 _signInState.value = SignInState.Success(authResult)
                 _isAuthenticated.value = true
+                _isGuestMode.value = false
             }.addOnFailureListener { e ->
                 _signInState.value = SignInState.Error(e.message ?: "Unexpected error occurred!")
             }
@@ -64,8 +69,9 @@ class AuthViewModel : ViewModel() {
                 val authResult = auth.signInWithCredential(credential).await()
                 _signInState.value = SignInState.Success(authResult)
                 _isAuthenticated.value = true
+                _isGuestMode.value = false
             } catch (e: Exception) {
-                _signInState.value = SignInState.Error(e. message ?: "Unexpected error occurred!")
+                _signInState.value = SignInState.Error(e.message ?: "Unexpected error occurred!")
             }
         }
     }
@@ -85,10 +91,21 @@ class AuthViewModel : ViewModel() {
             .addOnSuccessListener { authResult ->
                 _signInState.value = SignInState.Success(authResult)
                 _isAuthenticated.value = true
+                _isGuestMode.value = false
             }
             .addOnFailureListener { e ->
                 _signInState.value = SignInState.Error(e.message ?: "Unexpected error occurred!")
             }
+    }
+
+    /**
+     * A function which is responsible for allowing signing in as a guest user.
+     */
+    fun signInAsGuest() {
+        _signInState.value = SignInState.Loading
+        _isGuestMode.value = true
+        _isAuthenticated.value = false
+        _signInState.value = SignInState.GuestSuccess
     }
 
     /**

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -62,9 +63,18 @@ fun LoginScreen(
         when (val state = signInState) {
             is SignInState.Success -> {
                 Log.d("CIT - LoginScreen", "Login / Signup Successful")
-                Toast.makeText(context, "Google Account Authenticated", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Account Authenticated Successfully", Toast.LENGTH_SHORT).show()
 
                 navController.navigate("MainScaffold") { // On success, navigates to main content.
+                    popUpTo("Login") { inclusive = true}
+                }
+                authViewModel.resetSignInState()
+            }
+            is SignInState.GuestSuccess -> {
+                Log.d("CIT - LoginScreen", "Guest Login Successful")
+                Toast.makeText(context, "Guest Login Successful", Toast.LENGTH_SHORT).show()
+
+                navController.navigate("MainScaffold") {
                     popUpTo("Login") { inclusive = true}
                 }
                 authViewModel.resetSignInState()
@@ -101,13 +111,21 @@ fun LoginScreen(
                         }
                     }
                 )
-
                 // Github Auth Button
                 AuthButton(
-                    text = "Sign in with Github",
+                    text = "Sign in with GitHub",
                     icon = painterResource(id = R.drawable.github_mark),
                     onClick = {
                         authViewModel.signInWithGithub(activity)
+                    }
+                )
+                HorizontalDivider(modifier = Modifier .padding(12.dp))
+                // Guest Sign-in
+                AuthButton(
+                    text = "Continue as Guest",
+                    icon = painterResource(id = R.drawable.ic_guest),
+                    onClick = {
+                        authViewModel.signInAsGuest()
                     }
                 )
             }
