@@ -77,6 +77,8 @@ class AuthViewModel : ViewModel() {
         _signInState.value = SignInState.Loading
         val provider = OAuthProvider.newBuilder("github.com").apply {
             scopes = listOf("user:email", "read:user")
+            // Ensures user is prompted to select an account on sign-in.
+            addCustomParameter("prompt", "select_account")
         }.build()
 
         auth.startActivityForSignInWithProvider(activity, provider)
