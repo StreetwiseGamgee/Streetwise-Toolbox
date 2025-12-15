@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Cooperative Demo #3"
+rootProject.name = "Streetwise Toolbox"
 include(":app")
  

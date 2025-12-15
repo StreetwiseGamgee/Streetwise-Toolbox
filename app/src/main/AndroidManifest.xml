@@ -18,11 +18,22 @@
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
+            android:launchMode="singleTask"
             android:theme="@style/Theme.CooperativeDemo1DeviceStatistics">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                    <!-- 'android:scheme' pulled from google-services.json to allow Github OAuth -->
+                <data
+                    android:host="firebase.auth"
+                    android:path="/"
+                    android:scheme="com.googleusercontent.apps.377482797690-hispmgku6817os74pgifpr1dnv1625k4" />
             </intent-filter>
         </activity>
         <provider
@@ -32,8 +43,6 @@
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
-
-        <!-- android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" is to protect this provider from accessing by normal apps -->
     </application>
 
 </manifest>

@@ -3,10 +3,11 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.devtoolsKsp)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
-    namespace = "com.cturner56.cooperative_demo_3"
+    namespace = "com.cturner56.streetwise_toolbox"
     compileSdk = 36
 
     sourceSets {
@@ -16,7 +17,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.cturner56.cooperative_demo_3"
+        applicationId = "com.cturner56.streetwise_toolbox"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -47,6 +48,10 @@ android {
     }
 }
 
+configurations.all {
+    exclude(group = "com.google.firebase", module = "protolite-well-known-types")
+}
+
 dependencies {
 
     implementation(libs.androidx.core.ktx)
@@ -56,9 +61,7 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
-    implementation(libs.protolite.well.known.types)
     implementation(libs.material3)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -83,5 +86,21 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.room.common)
+
+    // firebase
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth)
+
+    // credentials
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services.auth)
+
+    // google
+    implementation(libs.googleid)
+
+    // coil
+    implementation(libs.coil.compose)
+
+    // ksp
     ksp(libs.androidx.room.compiler)
 }
