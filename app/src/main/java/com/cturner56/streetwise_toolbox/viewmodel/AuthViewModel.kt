@@ -31,13 +31,11 @@ sealed class SignInState {
  */
 class AuthViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
     private val _isAuthenticated = MutableStateFlow(auth.currentUser != null) // Checks current user
     val isAuthenticated = _isAuthenticated.asStateFlow()
-
+    private val _photoUrl = MutableStateFlow(auth.currentUser?.photoUrl)
+    val photoUrl = _photoUrl.asStateFlow()
     private val _isGuestMode = MutableStateFlow(false)
-    val isGuestMode = _isGuestMode.asStateFlow()
-
     private val _signInState = MutableStateFlow<SignInState>(SignInState.Idle) // Holds current state
     val signInState = _signInState.asStateFlow()
 
@@ -47,6 +45,7 @@ class AuthViewModel : ViewModel() {
             task.addOnSuccessListener { authResult ->
                 _signInState.value = SignInState.Success(authResult)
                 _isAuthenticated.value = true
+                _photoUrl.value = auth.currentUser?.photoUrl
                 _isGuestMode.value = false
             }.addOnFailureListener { e ->
                 _signInState.value = SignInState.Error(e.message ?: "Unexpected error occurred!")
@@ -69,6 +68,7 @@ class AuthViewModel : ViewModel() {
                 val authResult = auth.signInWithCredential(credential).await()
                 _signInState.value = SignInState.Success(authResult)
                 _isAuthenticated.value = true
+                _photoUrl.value = auth.currentUser?.photoUrl
                 _isGuestMode.value = false
             } catch (e: Exception) {
                 _signInState.value = SignInState.Error(e.message ?: "Unexpected error occurred!")
@@ -91,6 +91,7 @@ class AuthViewModel : ViewModel() {
             .addOnSuccessListener { authResult ->
                 _signInState.value = SignInState.Success(authResult)
                 _isAuthenticated.value = true
+                _photoUrl.value = auth.currentUser?.photoUrl
                 _isGuestMode.value = false
             }
             .addOnFailureListener { e ->
@@ -114,6 +115,7 @@ class AuthViewModel : ViewModel() {
     fun logout() {
         auth.signOut()
         _isAuthenticated.value = false
+        _photoUrl.value = null
     }
 
     /**

@@ -98,5 +98,9 @@ dependencies {
     // google
     implementation(libs.googleid)
 
+    // coil
+    implementation(libs.coil.compose)
+
+    // ksp
     ksp(libs.androidx.room.compiler)
 }

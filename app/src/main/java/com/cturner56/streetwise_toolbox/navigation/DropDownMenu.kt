@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.cturner56.streetwise_toolbox.viewmodel.AuthViewModel
 
 /**
  * A composable which provides additional screens to navigate via a dropdown menu.
@@ -26,7 +27,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
  * @param navController Used to handle navigation events when a [DropdownMenuItem] is clicked.
  */
 @Composable
-fun DropdownMenu(navController: NavController) {
+fun DropdownMenu(
+    navController: NavController,
+    authViewModel: AuthViewModel,
+    onLogout: () -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
 
     val navBackStackEntry = navController.currentBackStackEntryAsState()
@@ -36,6 +41,7 @@ fun DropdownMenu(navController: NavController) {
     val ic_dropdown = painterResource(id= R.drawable.ic_dropdown)
     val ic_info = painterResource(id= R.drawable.ic_info)
     val ic_repos = painterResource(id = R.drawable.ic_repos)
+    val ic_account_mgmt = painterResource(id = R.drawable.ic_account_mgmt)
 
     Box(
         modifier = Modifier
@@ -72,6 +78,18 @@ fun DropdownMenu(navController: NavController) {
                 leadingIcon = { Icon(painter = ic_repos, contentDescription = null) },
                 onClick = {
                     navController.navigate(Destination.RepoSpotlight.route)
+                }
+            )
+
+            HorizontalDivider()
+
+            DropdownMenuItem(
+                text = { Text("Account Logout") },
+                leadingIcon = { Icon(painter = ic_account_mgmt, contentDescription = null) },
+                onClick = {
+                    authViewModel.logout()
+                    onLogout()
+                    expanded = false
                 }
             )
         }
