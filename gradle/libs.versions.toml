@@ -56,6 +56,7 @@ converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.r
 # Firebase libs
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 
 # Credentials libs
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }

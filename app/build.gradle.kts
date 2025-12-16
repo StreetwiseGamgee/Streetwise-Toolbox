@@ -45,11 +45,8 @@ android {
     buildFeatures {
         compose = true
         aidl = true
+        buildConfig = true
     }
-}
-
-configurations.all {
-    exclude(group = "com.google.firebase", module = "protolite-well-known-types")
 }
 
 dependencies {
@@ -90,6 +87,7 @@ dependencies {
     // firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
 
     // credentials
     implementation(libs.androidx.credentials)
