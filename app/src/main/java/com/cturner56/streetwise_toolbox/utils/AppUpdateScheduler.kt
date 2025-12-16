@@ -23,6 +23,13 @@ import com.cturner56.streetwise_toolbox.viewmodel.AuthViewModel
 import com.cturner56.streetwise_toolbox.BuildConfig
 import java.util.concurrent.TimeUnit
 
+/**
+ * A [CoroutineWorker] which periodically checks for new release updates from Streetwise-Toolbox.
+ * If a new version is found, a notification will be sent to the user.
+ *
+ * @param appContext The application contex.
+ * @param workerParams Parameters for the worker.
+ */
 class AppUpdateScheduler(
     private val appContext: Context,
     workerParams: WorkerParameters
@@ -30,7 +37,11 @@ class AppUpdateScheduler(
     private val TAG = "CIT - AppUpdateWorker"
 
     /**
+     * Primary work method for worker.
+     * It checks the user's update preference and if enabled, queries the Github API for new releases.
      *
+     * @return [Result.Success] if the check is completed, and or not required.
+     * @return [Result.retry] if there's a recoverable error during the API call.
      */
     override suspend fun doWork(): Result {
         if (!AuthViewModel.getUpdatePreferenceBlocking()) {
@@ -70,7 +81,12 @@ class AppUpdateScheduler(
     }
 
     /**
+     * A function which is responsible for displaying a system notification to the user when a new
+     * release of the application is made available. By tapping the notification a user is redirected
+     * in their browser to the respective release available.
      *
+     * @param context The application context.
+     * @param remoteVersion The version string that is associated with the new update.
      */
     private fun showUpdateNotification(context: Context, remoteVersion: String) {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -106,7 +122,11 @@ class AppUpdateScheduler(
         private const val WORKER_TAG = "AppUpdateWorker"
 
         /**
+         * A function which is responsible for scheduling a unique periodic work request.
+         * It currently is set to check for an update every twenty-four hours.
+         * It uses [ExistingPeriodicWorkPolicy.KEEP] to avoid rescheduling if already scheduled.
          *
+         * @param context The application context used to get the [WorkManager] instance.
          */
         fun scheduleWork(context: Context) {
             val workRequest = PeriodicWorkRequestBuilder<AppUpdateScheduler>(1, TimeUnit.DAYS).build()
@@ -119,7 +139,8 @@ class AppUpdateScheduler(
         }
 
         /**
-         *
+         * A function which is responsible for the cancellation of all scheduled work associated
+         * with the [WORKER_TAG]. It's used in the event a user opts out from receiving in-app updates.
          */
         fun cancelWork(context: Context) {
             WorkManager.getInstance(context).cancelAllWorkByTag(WORKER_TAG)
