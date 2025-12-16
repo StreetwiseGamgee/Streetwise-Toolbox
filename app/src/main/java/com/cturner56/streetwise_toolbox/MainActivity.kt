@@ -144,10 +144,7 @@ fun MainActivityScaffold(authViewModel: AuthViewModel, onLogout: () -> Unit) {
                 modifier = Modifier.padding(paddingValues)
             ) {
                 composable(Destination.Battery.route) { BatteryScreen() }
-                composable(Destination.Build.route) { BuildScreen(
-                    isShizukuGranted = isGranted,
-                    onRequestShizukuPermission = requestPermission
-                )}
+                composable(Destination.Build.route) { BuildScreen()}
 
                 composable(Destination.Memory.route) { MemoryScreen() }
                 composable(Destination.About.route) { AboutScreen() }
