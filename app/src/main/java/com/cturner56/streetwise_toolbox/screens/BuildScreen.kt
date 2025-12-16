@@ -1,5 +1,7 @@
 package com.cturner56.streetwise_toolbox.screens
 
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -17,10 +19,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.tooling.preview.Preview
 import com.cturner56.streetwise_toolbox.ui.theme.CooperativeDemo1DeviceStatisticsTheme
 import androidx.compose.ui.unit.dp
 import com.cturner56.streetwise_toolbox.data.ShellCmdletRepo
+import com.cturner56.streetwise_toolbox.utils.PermissionRequestHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -44,8 +49,26 @@ fun getBuildProps(): Map<String, String> {
 }
 
 /**
+ * A function which is responsible for checking if Shizuku is installed.
+ *
+ * @param context The application context.
+ */
+fun isShizukuInstalled(context: Context): Boolean {
+    return try {
+        context.packageManager.getPackageInfo("moe.shizuku.privileged.api", 0)
+        true
+    } catch (e: PackageManager.NameNotFoundException) {
+        false
+    }
+}
+
+/**
  * Main composable which is responsible for displaying Android build.props.
- * If the Shizuku permission is granted, it will retrieve and display additional info regarding the kernel.
+ *
+ * If Shizuku is installed and permission is granted,
+ * it will retrieve and display additional info regarding the kernel.
+ *
+ * Otherwise, it will ask users to download the application.
  *
  * It utilizes [produceState] to load data asynchronously from [ShellCmdletRepo] when
  * the permission status changes.
@@ -59,6 +82,15 @@ fun BuildScreen(
     isShizukuGranted: Boolean,
     onRequestShizukuPermission: () -> Unit
 ) {
+    // The context and URL handler to open URLs
+    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
+    val shizukuDownloadUrl = "https://shizuku.rikka.app/download/"
+    val shizukuSetupUrl = "https://drive.google.com/file/d/1bVa8xzHhbCA5jJLMqenYPXVcL5fBXhUU/view?usp=sharing"
+
+    // Checks if Shizuku os installed, and remembers the state.
+    val isAppInstalled = remember { isShizukuInstalled(context) }
+
     // Fetches kernel version using Shizuku when the permission is granted.
     val kernelVersion by produceState(initialValue = "Loading...", isShizukuGranted) {
         value = if (isShizukuGranted) {
@@ -113,15 +145,32 @@ fun BuildScreen(
             }
         }
 
-        // Conditionally displays permission request if Shizuku hasn't been granted.
         if (!isShizukuGranted) {
             Button(
-                onClick = onRequestShizukuPermission,
+                onClick = {
+                    // If Shizuku is installed, request the permission when clicked.
+                    if (isAppInstalled) {
+                        PermissionRequestHandler.requestHandler(
+                            onPermissionResult = { isGranted ->
+                                if (isGranted) {
+                                    onRequestShizukuPermission()
+                                }
+                            },
+                            onServiceNotRunning = {
+                                uriHandler.openUri(shizukuSetupUrl)
+                            }
+                        )
+
+                    } else {
+                        uriHandler.openUri(shizukuDownloadUrl) // Otherwise, open the download URL.
+                    }
+                },
                 modifier = Modifier
                     .padding(horizontal = 12.dp, vertical = 12.dp)
                     .fillMaxWidth()
             ) {
-                Text(text = "Request Shizuku Permission")
+                Text(text = if (isAppInstalled) "Request Shizuku Permission" else
+                    "Download and Install Shizuku to Request Permission")
             }
         } else {
             Card( // Displays read-only kernel version fetched from Shizuku.

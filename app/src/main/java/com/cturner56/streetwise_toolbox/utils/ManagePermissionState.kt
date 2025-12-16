@@ -10,10 +10,12 @@ import androidx.compose.runtime.setValue
 /**
  * A composable function that acts as a state holder for Shizuku's permission status, and request logic.
  *
+ * @param onServiceNotRunning A callback which is invoked if the Shizuku service is not running.
  * @param content A trailing lambda which receives both 'isGranted' and 'requestPermission'.
  */
 @Composable
 fun ManagePermissionState(
+    onServiceNotRunning: () -> Unit,
     content: @Composable (isGranted: Boolean, requestPermission: () -> Unit) -> Unit) {
 
     /**
@@ -29,9 +31,12 @@ fun ManagePermissionState(
     var key by rememberSaveable { mutableStateOf(0) } // Allows key to trigger the effect again if required.
 
     LaunchedEffect(key) { // Effect runs on initial composition, and when the key changes.
-        PermissionRequestHandler.requestHandler{ granted ->
-            isGranted = granted
-        }
+        PermissionRequestHandler.requestHandler(
+            onPermissionResult = { granted ->
+                isGranted = granted
+            },
+            onServiceNotRunning = onServiceNotRunning
+        )
     }
 
     /**

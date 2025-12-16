@@ -99,7 +99,14 @@ fun MainActivityScaffold(authViewModel: AuthViewModel, onLogout: () -> Unit) {
         }
     }
 
-    ManagePermissionState { isGranted, requestPermission ->
+    ManagePermissionState(
+        onServiceNotRunning = {
+            Toast.makeText(context,
+                "Shizuku service isn't running, " +
+                        "click 'request' to redirect to a video tutorial'",
+                Toast.LENGTH_LONG).show()
+        }
+    ) { isGranted, requestPermission ->
         val innerNavController = rememberNavController()
         Scaffold(
             topBar = {
