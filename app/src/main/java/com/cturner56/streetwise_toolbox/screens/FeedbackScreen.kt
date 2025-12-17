@@ -21,18 +21,54 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat.startActivity
 import com.cturner56.streetwise_toolbox.R
-import com.cturner56.streetwise_toolbox.ui.theme.CooperativeDemo1DeviceStatisticsTheme
 
 /**
- * Main composable which is responsible for displaying [FeedbackSections].
+ * Main composable which is responsible managing the state and logic for the feedback screen.
  * Users can type their feedback here, and have it submitted in their desired email client.
  */
 @Composable
 fun FeedbackScreen(){
+    var subject by remember { mutableStateOf("")}
+    var feedbackBody by remember { mutableStateOf("")}
+    val context = LocalContext.current
+
+    val onSubmit = {
+        composeEmail(
+            context = context,
+            addresses = arrayOf("cturner56@academic.rrc.ca"),
+            subject = subject,
+            extraText = feedbackBody
+        )
+    }
+
+    FeedbackScreenContents(
+        subject = subject,
+        onSubjectChange = { subject = it },
+        feedbackBody = feedbackBody,
+        onFeedbackBodyChange = { feedbackBody = it },
+        onSubmit = onSubmit
+    )
+}
+
+/**
+ * A re-usable stateless composable which is responsible for displaying the UI of the feedback screen.
+ *
+ * @param subject The current text which is entered in the subject field of the feedback form.
+ * @param onSubjectChange A lambda function which is responsible for updating the [subject] state.
+ * @param feedbackBody The current text which is entered in the feedback body field of the feedback form.
+ * @param onFeedbackBodyChange A lambda function which is responsible for updating the [feedbackBody] state.
+ */
+@Composable
+fun FeedbackScreenContents(
+    subject: String,
+    onSubjectChange: (String) -> Unit,
+    feedbackBody: String,
+    onFeedbackBodyChange: (String) -> Unit,
+    onSubmit: () -> Unit
+) {
     Card(
         modifier = Modifier
             .padding(12.dp)
@@ -45,60 +81,32 @@ fun FeedbackScreen(){
                 modifier = Modifier.padding(bottom = 12.dp)
             )
             Text(text = stringResource(id = R.string.feedback_welcome_description))
+            HorizontalDivider(modifier = Modifier.padding(12.dp))
 
-            HorizontalDivider(modifier = Modifier .padding(12.dp))
-
-            FeedbackSections()
-        }
-    }
-}
-
-/**
- * Composable function which provides the UI for staging, and sending feedback via email.
- *
- * Fields for the subject / feedback are provided, and a button to submit.
- * The internal state for each field is managed using [remember] and [mutableStateOf].
- * When a user clicks "Submit Feedback" it invokes [composeEmail] to create and send the email.
- */
-@Composable
-fun FeedbackSections() {
-    var subject by remember { mutableStateOf("")}
-    var extraText by remember { mutableStateOf("")}
-    val context = LocalContext.current
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-
-    ) {
-        OutlinedTextField(
-            value = subject,
-            onValueChange =  {subject = it },
-            label = { Text("Subject") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true
-        )
-        OutlinedTextField(
-            value = extraText,
-            onValueChange =  {extraText = it },
-            label = { Text("Feedback") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = false,
-            minLines = 6,
-            maxLines = 12
-        )
-        Button(
-            onClick = {
-                composeEmail(
-                    context = context,
-                    addresses = arrayOf("cturner56@academic.rrc.ca"),
-                    subject = subject,
-                    extraText = extraText
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) { OutlinedTextField(
+                value = subject,
+                onValueChange = onSubjectChange,
+                label = { Text("Subject") },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+                OutlinedTextField(
+                    value = feedbackBody,
+                    onValueChange = onFeedbackBodyChange,
+                    label = { Text("Feedback") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = false,
+                    minLines = 6,
+                    maxLines = 12
                 )
-            },
-        ) {
-            Text("Submit Feedback")
+                Button(onClick = onSubmit) {
+                    Text("Submit Feedback")
+                }
+            }
         }
     }
 }
@@ -114,7 +122,6 @@ fun FeedbackSections() {
  * @param addresses An array of recipient email addresses.
  * @param subject The subject line of the composed email.
  * @param extraText The main body of the composed email.
- *
  */
 fun composeEmail(context: Context, addresses: Array<String>, subject: String, extraText: String) {
     val intent = Intent(Intent.ACTION_SEND).apply {
@@ -125,17 +132,5 @@ fun composeEmail(context: Context, addresses: Array<String>, subject: String, ex
     }
     if (intent.resolveActivity(context.packageManager) != null) {
         startActivity(context, intent, null)
-    }
-}
-
-/**
- * A preview composable for the [FeedbackScreen].
- * Providing a means to visualize the screen without running the application.
- */
-@Preview(showBackground = true)
-@Composable
-fun FeedbackScreenPreview() {
-    CooperativeDemo1DeviceStatisticsTheme {
-        FeedbackScreen()
     }
 }
