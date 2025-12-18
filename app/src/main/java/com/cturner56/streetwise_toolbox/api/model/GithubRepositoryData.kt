@@ -13,7 +13,7 @@ import com.squareup.moshi.JsonClass
  *      Moshi - Utilizes such for a network data model.
  *      Room-DB - Utilizes such as a database entity
  *
- * @property id || Represents the uuid for the repo.
+ * @property id || Represents the unique id for the repository.
  * @property name || Represents the repo's name.
  * @property fullName || Represents both the author, and repository name conjoined.
  *      Example: "ZG089/Re-Malwack"
@@ -53,11 +53,11 @@ data class GithubRepository (
  *      Moshi - Utilizes such for a network data model.
  *      Room-DB - Utilizes such as a database entity
  *
- *  @property id || Represents the uuid for the repo.
+ *  @property id || Represents the unique id for the release.
  *  @property repoFullName || A means to link releases back to a repo in the database.
- *  @property tagName || Represents the repo's name.
+ *  @property tagName || Represents the repo's tag name.
  *  @property datePublished || Represents the point in which the release was published.
- *  @property releaseNotes || Provides notes for a given repo's release.
+ *  @property releaseNotes || Provides notes for a given repo's release. (Unused, intended to display as an optional pop-up WIP)
  *  @property htmlUrl || The url to a given repo.
  *
  * doc-ref (Table is based on example response output):

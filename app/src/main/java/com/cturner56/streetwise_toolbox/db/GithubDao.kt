@@ -12,13 +12,9 @@ import com.cturner56.streetwise_toolbox.api.model.RepositoryReleaseVersion
  * DAO - For Github Repository Related Data
  *
  * The interface defines db operations for 'github_repos' and 'github_releases' tables.
- * Allowing the ViewModel to perform insert and query operations.
- * In addition to such, it is also responsible managing the cached data fetched from the Restful API.
- *
- * [GithubRepository]
- *      and
- * [RepositoryReleaseVersion] 's data classes are used in storing, updating, and querying data.
- *
+ * Allowing the GithubRepositoryManager to perform insert, delete and query operations on cached data.
+ * fetched from the Restful API. [GithubRepository] and [RepositoryReleaseVersion] 's data classes
+ * are used in storing, updating, and querying data.
  */
 @Dao
 interface GithubDao {
@@ -71,6 +67,11 @@ interface GithubDao {
     @Delete
     suspend fun deleteRepository(repo: GithubRepository)
 
+    /**
+     * Deletes a single instance of a GitHub release from the 'github_releases' table.
+     *
+     * @param repoFullName the full name (owner/repo) that is associated with a repository
+     */
     @Query("DELETE FROM github_releases WHERE repoFullName = :repoFullName")
     suspend fun deleteReleasesForRepository(repoFullName: String)
 }
