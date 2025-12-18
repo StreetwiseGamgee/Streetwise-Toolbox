@@ -50,9 +50,20 @@ class GithubViewModel(application: Application) : AndroidViewModel(application) 
                 fetchFeaturedRepos()
             }
         } else {
-            _isNetworkRefreshDisabled.value = false
-            userSavedRepositories = emptyList()
-            fetchFeaturedRepos()
+            viewModelScope.launch {
+                // Resets memory state.
+                _isNetworkRefreshDisabled.value = false
+                userSavedRepositories = emptyList()
+
+                // Clear local database cache.
+                repositoryManager.clearAllData()
+
+                // Clear the UI state
+                _repositoryListState.value = emptyList()
+                _releasesState.value = emptyMap()
+
+                fetchFeaturedRepos() // Fetch default pre-defined repository list.
+            }
         }
     }
 
@@ -127,11 +138,13 @@ class GithubViewModel(application: Application) : AndroidViewModel(application) 
      */
     fun toggleNetworkRefresh(isDisabled: Boolean) {
         _isNetworkRefreshDisabled.value = isDisabled // Update UI so switch immediately responds.
+
+        viewModelScope.launch {
+            userRepositoryManager.updateNetworkRefreshPreferences(isDisabled)
+        }
+
         if (!isDisabled) {
             fetchFeaturedRepos()
-            viewModelScope.launch {
-                userRepositoryManager.updateNetworkRefreshPreferences(isDisabled)
-            }
         }
     }
 

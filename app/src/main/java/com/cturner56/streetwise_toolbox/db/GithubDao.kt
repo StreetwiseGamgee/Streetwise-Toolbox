@@ -74,4 +74,16 @@ interface GithubDao {
      */
     @Query("DELETE FROM github_releases WHERE repoFullName = :repoFullName")
     suspend fun deleteReleasesForRepository(repoFullName: String)
+
+    /**
+     * Deletes all repositories from the github_repos table.
+     */
+    @Query("DELETE FROM github_repos")
+    suspend fun deleteAllRepositories()
+
+    /**
+     * Deletes all releases from the github_releases table.
+     */
+    @Query("DELETE FROM github_releases")
+    suspend fun deleteAllReleases()
 }

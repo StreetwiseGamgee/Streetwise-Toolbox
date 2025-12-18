@@ -103,4 +103,12 @@ class GithubRepositoryManager(private val dao: GithubDao) {
 
         return@withContext newlyInsertedRepo
     }
+
+    /**
+     * A function which is responsible for wiping local data when a user signs out.
+     */
+    suspend fun clearAllData() = withContext(Dispatchers.IO) {
+        dao.deleteAllRepositories()
+        dao.deleteAllReleases()
+    }
 }
