@@ -6,6 +6,12 @@ import com.cturner56.streetwise_toolbox.db.GithubDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
+/**
+ * A manager class which is responsible for acting as the middle man between tha Dao
+ * and the Retrofit network api. It's purpose is to facilitate retrieval of data from the network
+ * and, passes it to the ViewModel. Additionally, it is responsible for the caching of data into
+ * the local room-db.
+ */
 class GithubRepositoryManager(private val dao: GithubDao) {
     private val api = Api.retrofitService
 
