@@ -1,5 +1,7 @@
 package com.cturner56.streetwise_toolbox.screens
 
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -13,16 +15,17 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.cturner56.streetwise_toolbox.ui.theme.CooperativeDemo1DeviceStatisticsTheme
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.cturner56.streetwise_toolbox.data.ShellCmdletRepo
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.cturner56.streetwise_toolbox.utils.PermissionRequestHandler
+import com.cturner56.streetwise_toolbox.viewmodel.BuildViewModel
 
 /**
  * Retrieves a map of essential build.props from Android's Build class.
@@ -44,42 +47,40 @@ fun getBuildProps(): Map<String, String> {
 }
 
 /**
- * Main composable which is responsible for displaying Android build.props.
- * If the Shizuku permission is granted, it will retrieve and display additional info regarding the kernel.
+ * A function which is responsible for checking if Shizuku is installed.
  *
- * It utilizes [produceState] to load data asynchronously from [ShellCmdletRepo] when
- * the permission status changes.
+ * @param context The application context.
+ */
+fun isShizukuInstalled(context: Context): Boolean {
+    return try {
+        context.packageManager.getPackageInfo("moe.shizuku.privileged.api", 0)
+        true
+    } catch (e: PackageManager.NameNotFoundException) {
+        false
+    }
+}
+
+/**
+ * Main composable which is responsible for displaying Android build.props and kernel information
  *
- * @param isShizukuGranted A bool which indicates whether the application has granted the permission.
- * @param onRequestShizukuPermission A lambda function which is invoked when a user clicks the grant
- * permission button.
+ * The screen observes the state from the [BuildViewModel] to show...
+ * - Basic device build properties which fetched on initialization.
+ * - A button to either download Shizuku, grant the permission, or redirect users to a video tutorial.
+ * - If the remote service is setup, and the permission is granted it will display the kernel version.
+ *
+ * @param buildViewModel The ViewModel instance which is responsible for providing the data.
  */
 @Composable
 fun BuildScreen(
-    isShizukuGranted: Boolean,
-    onRequestShizukuPermission: () -> Unit
+    buildViewModel: BuildViewModel = viewModel(),
 ) {
-    // Fetches kernel version using Shizuku when the permission is granted.
-    val kernelVersion by produceState(initialValue = "Loading...", isShizukuGranted) {
-        value = if (isShizukuGranted) {
-            withContext(Dispatchers.IO) {
-                ShellCmdletRepo.getKernelVersion()
-            }
-        } else {
-            "Unable to fetch Kernel Version"
-        }
-    }
+    // Collects state from the ViewModel.
+    // Recomposition will occur whenever the state changes.
+    val uiState by buildViewModel.uiState.collectAsState()
 
-    // Fetches the uname release version using Shizuku when the permission is granted.
-    val unameVersion by produceState(initialValue = "Loading...", isShizukuGranted) {
-        value = if (isShizukuGranted) {
-            withContext(Dispatchers.IO) {
-                ShellCmdletRepo.getUnameVersion()
-            }
-        } else {
-            "Unable to fetch Unix Name"
-        }
-    }
+    val uriHandler = LocalUriHandler.current
+    val shizukuDownloadUrl = "https://shizuku.rikka.app/download/"
+    val shizukuSetupUrl = "https://drive.google.com/file/d/1bVa8xzHhbCA5jJLMqenYPXVcL5fBXhUU/view?usp=sharing"
 
     Column {
         Card(
@@ -104,8 +105,7 @@ fun BuildScreen(
                 }
                 AnimatedVisibility(visibleState = state) {
                     Column {
-                        val properties = getBuildProps()
-                        properties.forEach { (key, value) ->
+                        uiState.buildProperties.forEach { (key, value) ->
                             DerivedProperty(key, value = value)
                         }
                     }
@@ -113,15 +113,32 @@ fun BuildScreen(
             }
         }
 
-        // Conditionally displays permission request if Shizuku hasn't been granted.
-        if (!isShizukuGranted) {
+        if (!uiState.isShizukuGranted) {
             Button(
-                onClick = onRequestShizukuPermission,
+                onClick = {
+                    // If Shizuku is installed, request the permission.
+                    if (uiState.isShizukuInstalled) {
+                        PermissionRequestHandler.requestHandler(
+                            onPermissionResult = { isGranted ->
+                                if (isGranted) {
+                                    buildViewModel.onShizukuPermissionGranted()
+                                }
+                            },
+                            onServiceNotRunning = {
+                                uriHandler.openUri(shizukuSetupUrl)
+                            }
+                        )
+
+                    } else {
+                        uriHandler.openUri(shizukuDownloadUrl) // Otherwise, open the download URL.
+                    }
+                },
                 modifier = Modifier
                     .padding(horizontal = 12.dp, vertical = 12.dp)
                     .fillMaxWidth()
             ) {
-                Text(text = "Request Shizuku Permission")
+                Text(text = if (uiState.isShizukuInstalled) "Request Kernel Information" else
+                    "Install Shizuku to Request Kernel Information")
             }
         } else {
             Card( // Displays read-only kernel version fetched from Shizuku.
@@ -139,7 +156,7 @@ fun BuildScreen(
                 AnimatedVisibility(visibleState = state) {
                     Column(modifier = Modifier.padding(25.dp)) {
                         Text(
-                            text = kernelVersion,
+                            text = uiState.kernelVersion,
                             style = MaterialTheme.typography.headlineSmall,
                             modifier = Modifier.padding(bottom = 12.dp)
                         )
@@ -161,7 +178,7 @@ fun BuildScreen(
                 AnimatedVisibility(visibleState = state) {
                     Column(modifier = Modifier.padding(25.dp)) {
                         Text(
-                            text = unameVersion,
+                            text = uiState.unameVersion,
                             style = MaterialTheme.typography.headlineSmall,
                             modifier = Modifier.padding(bottom = 12.dp)
                         )
@@ -184,25 +201,17 @@ fun DerivedProperty(key: String, value: String) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top
     ) {
         Text(
-            text = key
+            text = key,
+            modifier = Modifier.padding(end = 16.dp)
         )
         Text(
-            text = value
+            text = value,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f)
         )
-    }
-}
-
-/**
- * A preview composable for the [BuildScreen].
- * Providing a means to visualize the screen without running the application.
- */
-@Preview(showBackground = true)
-@Composable
-fun BuildScreenPreview() {
-    CooperativeDemo1DeviceStatisticsTheme {
-        BuildScreen(isShizukuGranted = false, onRequestShizukuPermission = {})
     }
 }

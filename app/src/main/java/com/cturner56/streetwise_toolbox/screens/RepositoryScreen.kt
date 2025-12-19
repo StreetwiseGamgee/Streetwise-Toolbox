@@ -2,6 +2,8 @@ package com.cturner56.streetwise_toolbox.screens
 
 import android.content.Intent
 import android.widget.Toast
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -33,7 +35,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cturner56.streetwise_toolbox.api.model.GithubRepository
 import com.cturner56.streetwise_toolbox.api.model.RepositoryReleaseVersion
-import com.cturner56.streetwise_toolbox.db.AppDatabase
 import com.cturner56.streetwise_toolbox.utils.NetworkStatus
 import com.cturner56.streetwise_toolbox.viewmodel.GithubViewModel
 import com.cturner56.streetwise_toolbox.R
@@ -41,6 +42,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,14 +62,15 @@ import androidx.compose.ui.text.input.TextFieldValue
  */
 @Composable
 fun RepositoryScreen(
-    githubViewModel: GithubViewModel = viewModel()
+    githubViewModel: GithubViewModel = viewModel(
+        viewModelStoreOwner = LocalActivity.current as ComponentActivity
+    )
 ) {
-    var showDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+    val showDialog = remember { mutableStateOf(false) }
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { showDialog = true }) {
+            FloatingActionButton(onClick = { showDialog.value = true }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_add_repo),
                     contentDescription = "Add repository",
@@ -82,13 +85,12 @@ fun RepositoryScreen(
             modifier = Modifier.padding(innerPadding)
         )
 
-        if (showDialog) {
+        if (showDialog.value) {
             AddRepositoryDialog(
-                onDismiss = { showDialog = false},
+                onDismiss = { showDialog.value = false},
                 onConfirm = {owner, repoName ->
-                    showDialog = false
-                    val dao = AppDatabase.getInstance(context).githubDao()
-                    githubViewModel.addRepository(owner, repoName, dao)
+                    showDialog.value = false
+                    githubViewModel.addRepository(owner, repoName)
                 }
             )
         }
@@ -113,19 +115,35 @@ fun ListRepositoryContent(githubViewModel: GithubViewModel, modifier: Modifier =
     val repositories = githubViewModel.repositoryListState.value
     val releases = githubViewModel.releasesState.value
     val error = githubViewModel.errorState.value
-    val context = LocalContext.current
-    val githubDao = AppDatabase.getInstance(context).githubDao()
 
-    // Triggers initial data retrieval when composable first enters composition.
-    LaunchedEffect(key1 = true) {
-        githubViewModel.fetchFeaturedRepos(githubDao)
-    }
+    // Listens to the offline togglable state.
+    val isNetworkRefreshDisabled = githubViewModel.isNetworkRefreshDisabled.value
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        )  {
+            Text(
+                text = "Disable Network Refresh",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold
+            )
+            Switch(
+                checked = isNetworkRefreshDisabled,
+                onCheckedChange = { isChecked ->
+                    githubViewModel.toggleNetworkRefresh(isChecked)
+                }
+            )
+        }
+
         val isLoading = repositories.isEmpty() && error == null
         when {
             isLoading -> { // Displays spinner when it initially fetched data.
@@ -157,7 +175,7 @@ fun ListRepositoryContent(githubViewModel: GithubViewModel, modifier: Modifier =
                                 repository = repo,
                                 release = release,
                                 onDelete = {
-                                    githubViewModel.deleteRepository(repo, githubDao)
+                                    githubViewModel.deleteRepository(repo)
                                 }
                             )
                         }
@@ -259,7 +277,7 @@ fun RepositoryCard(
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_star),
-                        contentDescription = "Star count",
+                        contentDescription = "Star count for ${repository.fullName}",
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.width(12.dp))
@@ -271,7 +289,7 @@ fun RepositoryCard(
                     IconButton(onClick = onDelete){
                         Icon(
                             painter = painterResource(id = R.drawable.ic_delete_repo),
-                            contentDescription = "Delete repository",
+                            contentDescription = "Delete repository ${repository.fullName}",
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -319,10 +337,7 @@ fun RepositoryCard(
 
 /**
  * Purpose - A function which allows text to be used as a hyperlink.
- * @param label - The hyperlink text.
- * @param color - The color defined for the text.
- * @param TextDecoration - The underline defined for the text.
- * @param Modifier - Allows the hyperlink to be clickable, and redirects the user to the
+ * Allows the hyperlink to be clickable, and redirects the user to the
  * respective website if connectivity is established. Otherwise, a toast notification is displayed.
  */
 @Composable

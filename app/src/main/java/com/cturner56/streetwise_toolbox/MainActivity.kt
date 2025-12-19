@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -99,7 +98,13 @@ fun MainActivityScaffold(authViewModel: AuthViewModel, onLogout: () -> Unit) {
         }
     }
 
-    ManagePermissionState { isGranted, requestPermission ->
+    ManagePermissionState(
+        onServiceNotRunning = {
+            Toast.makeText(context,
+                "Shizuku isn't running, click 'request' to see how-to video",
+                Toast.LENGTH_LONG).show()
+        }
+    ) { _, _ ->
         val innerNavController = rememberNavController()
         Scaffold(
             topBar = {
@@ -137,10 +142,7 @@ fun MainActivityScaffold(authViewModel: AuthViewModel, onLogout: () -> Unit) {
                 modifier = Modifier.padding(paddingValues)
             ) {
                 composable(Destination.Battery.route) { BatteryScreen() }
-                composable(Destination.Build.route) { BuildScreen(
-                    isShizukuGranted = isGranted,
-                    onRequestShizukuPermission = requestPermission
-                )}
+                composable(Destination.Build.route) { BuildScreen()}
 
                 composable(Destination.Memory.route) { MemoryScreen() }
                 composable(Destination.About.route) { AboutScreen() }

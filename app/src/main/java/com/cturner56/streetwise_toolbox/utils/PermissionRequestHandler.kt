@@ -1,6 +1,8 @@
 package com.cturner56.streetwise_toolbox.utils
 
 import android.content.pm.PackageManager
+import android.os.Handler
+import android.os.Looper
 import rikka.shizuku.Shizuku
 
 /**
@@ -13,6 +15,7 @@ object PermissionRequestHandler {
 
     // UID integer value which is used to identify our request.
     private const val REQUEST_CODE = 8812
+    private const val BINDER_TIMEOUT_AFTER = 3000L // Binder timeout in milliseconds.
 
     /**
      *  A function which is responsible for safely beginning the permission check process.
@@ -23,20 +26,34 @@ object PermissionRequestHandler {
      *
      *  @param onPermissionResult A callback lambda which receives the final result from [checkPermissionNow]
      *      - Final result: 'true' if granted, and 'false' if not.
+     *  @param onServiceNotRunning A callback lambda which is invoked if the binder isn't received
+     *  within the timeout period of [BINDER_TIMEOUT_AFTER].
      */
-    fun requestHandler(onPermissionResult: (isGranted: Boolean) -> Unit) {
+    fun requestHandler(
+        onPermissionResult: (isGranted: Boolean) -> Unit,
+        onServiceNotRunning: () -> Unit
+    ) {
         // Checks if binder is already alive.
         if (Shizuku.isPreV11() || Shizuku.getBinder() != null) {
-            // If the service is already active, check for permission.
             checkPermissionNow(onPermissionResult)
         } else {
-            val binderListener = object : Shizuku.OnBinderReceivedListener {
+            val handler = Handler(Looper.getMainLooper())
+            var binderListener: Shizuku.OnBinderReceivedListener? = null
+
+            val timeoutRunnable = Runnable {
+                binderListener?.let { Shizuku.removeBinderReceivedListener(it) }
+                onServiceNotRunning()
+            }
+
+            binderListener = object : Shizuku.OnBinderReceivedListener {
                 override fun onBinderReceived() {
+                    handler.removeCallbacks(timeoutRunnable)
                     checkPermissionNow(onPermissionResult)
                     Shizuku.removeBinderReceivedListener(this)
                 }
             }
             Shizuku.addBinderReceivedListener(binderListener)
+            handler.postDelayed(timeoutRunnable, BINDER_TIMEOUT_AFTER)
         }
     }
 

@@ -6,5 +6,6 @@ package com.cturner56.streetwise_toolbox.data
 data class BatteryData(
     val percentage: Int = 0,
     val isCharging: Boolean = false,
-    val temperature: Float = 0.0f
+    val temperature: Float = 0.0f,
+    val temperatureHistory: List<Float> = emptyList()
 )

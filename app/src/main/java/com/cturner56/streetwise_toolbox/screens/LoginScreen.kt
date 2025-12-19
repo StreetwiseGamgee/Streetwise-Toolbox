@@ -2,10 +2,12 @@ package com.cturner56.streetwise_toolbox.screens
 
 import android.app.Activity
 import android.content.Context
+import android.net.Uri
 import androidx.credentials.CredentialManager
 import androidx.credentials.GetCredentialRequest
 import android.util.Log
 import android.widget.Toast
+import android.widget.VideoView
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +32,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.cturner56.streetwise_toolbox.R
@@ -40,6 +43,71 @@ import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.launch
 import java.security.SecureRandom
 import androidx.credentials.CustomCredential
+
+/**
+ * A composable function which is responsible for rendering and looping a video background.
+ * Utilizing [AndroidView] to play the raw video resource. The function explicitly handles aspect
+ * ratios to ensure minimal whitespace is displayed.
+ * Credits for video / gif author:
+ *
+ * <a href="https://pixabay.com/users/dhiru6801-17848812/?utm_source=link-attribution&utm_medium=referral&utm_campaign=animation&utm_content=18050">Dhiru Bhai
+ * </a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=animation&utm_content=18050">Pixabay</a>
+ * License:
+ * https://pixabay.com/service/license-summary/
+ *
+ * GIF-Format was converted to .mp4 using Handbrake (FOSS Video Converter)
+ * Prior the size was 90+ mb and after conversion it's 2.13 mb
+ *
+ * @param modifier The modifier which is applied to the layout.
+ * @param videoResId The resource id affiliated with the raw video file [R.raw.login_bg_video].
+ */
+@Composable
+fun VideoBackground(
+    modifier: Modifier = Modifier,
+    @androidx.annotation.RawRes videoResId: Int
+) {
+    AndroidView(
+        modifier = modifier,
+        factory = { context ->
+            VideoView(context).apply {
+                setZOrderOnTop(false) // Prevents background from overlaying on-top of buttons.
+
+                val uri = Uri.parse("android.resource://${context.packageName}/$videoResId")
+                setVideoURI(uri)
+
+                setOnPreparedListener { mediaPlayer ->
+
+                    // Ensures video loops while playing.
+                    mediaPlayer.isLooping = true
+
+                    // Fetch video dimensions
+                    val videoWidth = mediaPlayer.videoWidth.toFloat()
+                    val videoHeight = mediaPlayer.videoHeight.toFloat()
+
+                    // Fetch screen dimensions
+                    val viewWidth = width.toFloat()
+                    val viewHeight = height.toFloat()
+
+                    // Calculates ratios
+                    val videoRatio = videoWidth / videoHeight
+                    val screenRatio = viewWidth / viewHeight
+
+                    // Calculates scale required for x and y.
+                    val calculatedScaleX = videoRatio / screenRatio
+                    val calculatedScaleY = screenRatio / videoRatio
+
+                    // Scale video to ensure there's no whitespace.
+                    val maxScale = kotlin.math.max(calculatedScaleX, calculatedScaleY)
+                    this.scaleX = maxScale * 1.5f // Forces scale to fill space.
+                    this.scaleY = maxScale * 1.5f
+
+                    this.rotation = 90f // Rotate the video 90 degrees.
+                    start()
+                }
+            }
+        }
+    )
+}
 
 /**
  * A composable function which is responsible for displaying the login screen.
@@ -91,6 +159,12 @@ fun LoginScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
+
+        VideoBackground(
+            modifier = Modifier.fillMaxSize(),
+            videoResId = R.raw.login_bg_video
+        )
+
         if (signInState is SignInState.Loading) {
             CircularProgressIndicator()
         } else {
