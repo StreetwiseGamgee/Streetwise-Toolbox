@@ -18,8 +18,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.cturner56.streetwise_toolbox.utils.PermissionRequestHandler
@@ -135,8 +137,8 @@ fun BuildScreen(
                     .padding(horizontal = 12.dp, vertical = 12.dp)
                     .fillMaxWidth()
             ) {
-                Text(text = if (uiState.isShizukuInstalled) "Request Shizuku Permission" else
-                    "Download and Install Shizuku to Request Permission")
+                Text(text = if (uiState.isShizukuInstalled) "Request Kernel Information" else
+                    "Install Shizuku to Request Kernel Information")
             }
         } else {
             Card( // Displays read-only kernel version fetched from Shizuku.
@@ -199,13 +201,17 @@ fun DerivedProperty(key: String, value: String) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top
     ) {
         Text(
-            text = key
+            text = key,
+            modifier = Modifier.padding(end = 16.dp)
         )
         Text(
-            text = value
+            text = value,
+            textAlign = TextAlign.End,
+            modifier = Modifier.weight(1f)
         )
     }
 }

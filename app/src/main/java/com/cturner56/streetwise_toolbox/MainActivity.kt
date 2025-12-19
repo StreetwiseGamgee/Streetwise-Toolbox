@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -103,10 +102,10 @@ fun MainActivityScaffold(authViewModel: AuthViewModel, onLogout: () -> Unit) {
         onServiceNotRunning = {
             Toast.makeText(context,
                 "Shizuku service isn't running, " +
-                        "click 'request' to redirect to a video tutorial'",
+                "click 'request button' to be redirected to a video tutorial.",
                 Toast.LENGTH_LONG).show()
         }
-    ) { isGranted, requestPermission ->
+    ) { _, _ ->
         val innerNavController = rememberNavController()
         Scaffold(
             topBar = {
