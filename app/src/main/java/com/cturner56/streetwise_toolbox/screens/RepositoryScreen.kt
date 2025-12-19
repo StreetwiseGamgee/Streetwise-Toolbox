@@ -3,6 +3,7 @@ package com.cturner56.streetwise_toolbox.screens
 import android.content.Intent
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -62,14 +63,14 @@ import androidx.compose.ui.text.input.TextFieldValue
 @Composable
 fun RepositoryScreen(
     githubViewModel: GithubViewModel = viewModel(
-        viewModelStoreOwner = LocalContext.current as ComponentActivity
+        viewModelStoreOwner = LocalActivity.current as ComponentActivity
     )
 ) {
-    var showDialog by remember { mutableStateOf(false) }
+    val showDialog = remember { mutableStateOf(false) }
 
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { showDialog = true }) {
+            FloatingActionButton(onClick = { showDialog.value = true }) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_add_repo),
                     contentDescription = "Add repository",
@@ -84,11 +85,11 @@ fun RepositoryScreen(
             modifier = Modifier.padding(innerPadding)
         )
 
-        if (showDialog) {
+        if (showDialog.value) {
             AddRepositoryDialog(
-                onDismiss = { showDialog = false},
+                onDismiss = { showDialog.value = false},
                 onConfirm = {owner, repoName ->
-                    showDialog = false
+                    showDialog.value = false
                     githubViewModel.addRepository(owner, repoName)
                 }
             )
@@ -119,7 +120,7 @@ fun ListRepositoryContent(githubViewModel: GithubViewModel, modifier: Modifier =
     val isNetworkRefreshDisabled = githubViewModel.isNetworkRefreshDisabled.value
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp),
     ) {
