@@ -105,7 +105,9 @@ class AppUpdateScheduler(
         }
 
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/StreetwiseGamgee/Streetwise-Toolbox/releases"))
-        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
 
         val notification = NotificationCompat.Builder(context, channelId)
             .setSmallIcon(R.drawable.ic_update_avail)
