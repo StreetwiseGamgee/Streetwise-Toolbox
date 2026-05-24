@@ -15,4 +15,7 @@
 local.properties
 app/google-services.json
 keystore.properties
+*.jks
+gradle-daemon-jvm.properties
+.idea/
 app/release
