@@ -109,18 +109,13 @@ com.cturner56.streetwise_toolbox/
 - (New!) on the login screen I've implemented a video-background so users aren't blinded by the vacant void of whitespace.
 
 ### Proposed Features:
-#### In-scope: 
-##### Battery Health (Extended):
-- ~~Provide a means to check the temperature of the device's battery~~ (Completed).
-- ~~Implement a graph-chart visual to represent the fluctuations or differences in real-time~~ (Completed).
-
-##### User Registry / Account Login:
-- ~~Provide a means of account registry and authentication~~ (Completed).
-- ~~Provide an in-app updater, or some type of notification system that let's users know when an update is available.~~
+#### In-scope:
+- CPU Temp monitoring
+- Root Checker / Rooting Tutorials?
+- Android Distribution Spotlight - Showcasing Various Android 'ROMS'
 
 #### Out of Scope:
-- Forum implementation: To allow users to share their discoveries, comment, and like other user submissions.
-- CPU Temp monitoring: For the same reason as battery monitoring though I am uncertain whether I have time currently.
+- To be determined by my hubris lol.
   
 ### Installation:
 #### For developers:
@@ -136,11 +131,11 @@ Requisite Directory Placement: ```app/google-services.json```
 
 
 #### For users:
-~~Will implement an apk for general use in the near future.~~ **SEE TAGGED RELEASES**
+**SEE TAGGED RELEASES**
+Application Packages Are Available!
 
 ### How-to Contribute:
 - Within the app there is a feedback section to which users can contact me.
 
 ## Contact Info:
-- [cturner56@academic.rrc.ca](mailto:cturner56@academic.rrc.ca)
 - [xblcit@gmail.com](mailto:xblcit@gmail.com)
